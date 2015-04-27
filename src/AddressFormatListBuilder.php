@@ -7,6 +7,7 @@
 
 namespace Drupal\address;
 
+use CommerceGuys\Addressing\Enum\AddressField;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Locale\CountryManagerInterface;
@@ -65,8 +66,7 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
 
     // Show the 'List subdivisions' operation if the parent format
     // uses at least the administrative area subdivision field.
-    $format = $entity->getFormat();
-    if (strpos($format, '%administrative_area') !== FALSE) {
+    if (in_array(AddressField::ADMINISTRATIVE_AREA, $entity->getUsedFields())) {
       $operations['subdivisions'] = array(
         'title' => $this->t('List subdivisions'),
         'url' => Url::fromRoute('entity.subdivision.collection', array(
