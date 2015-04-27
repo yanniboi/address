@@ -1,0 +1,5 @@
+'administer address formats':
+  title: 'Administer address formats'
+  description: 'Allows users to create, update, and delete address format entities.'
+  'restrict access': TRUE
+

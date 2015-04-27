@@ -1,0 +1,20 @@
+services:
+  address.subdivision_record_storage:
+    class: Drupal\address\SubdivisionRecordStorage
+    arguments: ['@config.factory']
+
+  address.subdivision_query:
+    class: Drupal\address\Entity\Query\SubdivisionQueryFactory
+    arguments: ['@address.subdivision_record_storage']
+
+  address.address_format_importer:
+    class: Drupal\address\AddressFormatImporter
+    arguments: ['@entity.manager', '@language_manager']
+
+  address.data_provider:
+    class: Drupal\address\DataProvider
+    arguments: ['@country_manager', '@entity.manager']
+
+  address.postal_formatter:
+    class: CommerceGuys\Addressing\Formatter\PostalFormatter
+    arguments: ['@address.data_provider']

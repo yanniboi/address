@@ -1,0 +1,85 @@
+entity.address_format.collection:
+  path: '/admin/config/regional/address-formats'
+  defaults:
+    _entity_list: 'address_format'
+    _title: 'Address formats'
+  requirements:
+    _permission: 'administer address formats'
+
+entity.address_format.import:
+  path: '/admin/config/regional/address-formats/import'
+  defaults:
+    _form: '\Drupal\address\Form\AddressFormatImporterForm'
+    _title: 'Import an address format'
+  requirements:
+    _permission: 'administer address formats'
+
+entity.address_format.add_form:
+  path: '/admin/config/regional/address-formats/add'
+  defaults:
+    _entity_form: 'address_format.add'
+    _title: 'Add a new address format'
+  requirements:
+    _entity_create_access: 'address_format'
+
+entity.address_format.edit_form:
+  path: '/admin/config/regional/address-formats/manage/{address_format}'
+  defaults:
+    _entity_form: 'address_format.edit'
+    _title: 'Edit an address format'
+  requirements:
+    _entity_access: 'address_format.update'
+
+entity.address_format.delete_form:
+  path: '/admin/config/regional/address-formats/manage/{address_format}/delete'
+  defaults:
+    _entity_form: 'address_format.delete'
+    _title: 'Delete an address format'
+  requirements:
+    _entity_access: 'address_format.delete'
+
+entity.subdivision.collection:
+  path: '/admin/config/regional/subdivisions/{address_format}/{parent}'
+  defaults:
+    parent: null
+    _controller: '\Drupal\address\Controller\SubdivisionController::buildList'
+    _title: 'Subdivisions'
+  options:
+    parameters:
+      address_format:
+        type: entity:address_format
+      parent:
+        type: entity:subdivision
+  requirements:
+    _permission: 'administer subdivisions'
+
+entity.subdivision.add_form:
+  path: '/admin/config/regional/subdivisions/add/{address_format}/{parent}'
+  defaults:
+    parent: null
+    _controller: '\Drupal\address\Controller\SubdivisionController::addForm'
+    _title: 'Add a new subdivision'
+  options:
+    parameters:
+      address_format:
+        type: entity:address_format
+      parent:
+        type: entity:subdivision
+  requirements:
+    _entity_create_access: 'subdivision'
+
+entity.subdivision.edit_form:
+  path: '/admin/config/regional/subdivisions/manage/{subdivision}'
+  defaults:
+    _entity_form: 'subdivision.edit'
+    _title: 'Edit a subdivision'
+  requirements:
+    _entity_access: 'subdivision.update'
+
+entity.subdivision.delete_form:
+  path: '/admin/config/regional/subdivisions/manage/{subdivision}/delete'
+  defaults:
+    _entity_form: 'subdivision.delete'
+    _title: 'Delete a subdivision'
+  requirements:
+    _entity_access: 'subdivision.delete'

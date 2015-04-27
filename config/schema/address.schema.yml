@@ -1,0 +1,69 @@
+address.address_format.*:
+  type: config_entity
+  label: 'Address format'
+  mapping:
+    countryCode:
+      type: string
+      label: 'Country code'
+    format:
+      type: string
+      label: 'Format'
+    requiredFields:
+      type: sequence
+      label: 'Required fields'
+      sequence:
+        - type: string
+    uppercaseFields:
+      type: sequence
+      label: 'Uppercase Fields'
+      sequence:
+        - type: string
+    administrativeAreaType:
+      type: string
+      label: 'Administrative area type'
+    localityType:
+      type: string
+      label: 'Locality type'
+    dependentLocalityType:
+      type: string
+      label: 'Dependent locality type'
+    postalCodeType:
+      type: string
+      label: 'Postal code type'
+    postalCodePattern:
+      type: string
+      label: 'Postal code pattern'
+    postalCodePrefix:
+      type: string
+      label: 'Postal code prefix'
+
+address.subdivisions.*:
+  type: mapping
+  label: 'Subdivisions'
+  mapping:
+    subdivisions:
+      type: sequence
+      label: 'Subdivisions'
+      sequence:
+        - type: address.subdivision.[%key]
+
+address.subdivision.*:
+  type: config_entity
+  label: 'Subdivision'
+  mapping:
+    countryCode:
+      type: string
+      label: 'Country code'
+    parentId:
+      type: string
+      label: 'Parent ID'
+    id:
+      type: string
+      label: 'ID'
+    code:
+      type: string
+      label: 'Code'
+    name:
+      type: label
+      label: 'Name'
+      translatable: true
