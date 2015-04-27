@@ -9,25 +9,30 @@ namespace Drupal\address;
 
 /**
  * Defines an address format importer.
+ *
+ * Imports the address format data provided by the library into config entities.
  */
 interface AddressFormatImporterInterface {
 
   /**
-   * Returns all importable address formats.
-   *
-   * @return \CommerceGuys\Addressing\Model\AddressFormatInterface[]
-   *    Array of importable address formats.
+   * Starts a batch process that imports all available data.
    */
-  public function getImportableAddressFormats();
+  public function startImport();
 
   /**
-   * Creates a new address format object for the given country code.
+   * Imports address formats with the given country codes.
    *
-   * @param string $countryCode
-   *   The country code.
-   *
-   * @return \Drupal\address\Entity\AddressFormat | bool
-   *    The new address format or false if the address format is already imported.
+   * @param array $countryCodes
+   *   The country codes used to identify address formats.
    */
-  public function importAddressFormat($countryCode);
+  public function importEntities(array $countryCodes);
+
+  /**
+   * Imports translations for the given language codes.
+   *
+   * @param array $langcodes
+   *   Language codes used for the translations.
+   */
+  public function importTranslations(array $langcodes);
+
 }

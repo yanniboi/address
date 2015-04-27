@@ -5,3 +5,13 @@
  * Provides functionality for handling postal addresses.
  */
 
+use Drupal\language\Entity\ConfigurableLanguage;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for 'address_format'.
+ */
+function address_configurable_language_insert(ConfigurableLanguage $language) {
+  // Allow the importer to import any found translations for the new language.
+  $importer = \Drupal::service('address.address_format_importer');
+  $importer->importTranslations([$language->getId()]);
+}

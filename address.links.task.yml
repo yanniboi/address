@@ -3,11 +3,6 @@ entity.address_format.collection:
   base_route: 'entity.address_format.collection'
   title: 'List'
 
-entity.address_format.import:
-  route_name: 'entity.address_format.import'
-  base_route: 'entity.address_format.collection'
-  title: 'Import'
-
 entity.subdivision.collection:
   route_name: 'entity.subdivision.collection'
   base_route: 'entity.subdivision.collection'

@@ -6,14 +6,6 @@ entity.address_format.collection:
   requirements:
     _permission: 'administer address formats'
 
-entity.address_format.import:
-  path: '/admin/config/regional/address-formats/import'
-  defaults:
-    _form: '\Drupal\address\Form\AddressFormatImporterForm'
-    _title: 'Import an address format'
-  requirements:
-    _permission: 'administer address formats'
-
 entity.address_format.add_form:
   path: '/admin/config/regional/address-formats/add'
   defaults:
