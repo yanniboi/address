@@ -60,27 +60,6 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
-    $operations = parent::getDefaultOperations($entity);
-
-    // Show the 'List subdivisions' operation if the parent format
-    // uses at least the administrative area subdivision field.
-    if (in_array(AddressField::ADMINISTRATIVE_AREA, $entity->getUsedFields())) {
-      $operations['subdivisions'] = array(
-        'title' => $this->t('List subdivisions'),
-        'url' => Url::fromRoute('entity.subdivision.collection', array(
-          'address_format' => $entity->id(),
-        )),
-      );
-    }
-
-    return $operations;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildHeader() {
     $header['country'] = $this->t('Country');
     $header['status'] = $this->t('Status');

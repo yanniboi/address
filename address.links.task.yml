@@ -2,8 +2,3 @@ entity.address_format.collection:
   route_name: 'entity.address_format.collection'
   base_route: 'entity.address_format.collection'
   title: 'List'
-
-entity.subdivision.collection:
-  route_name: 'entity.subdivision.collection'
-  base_route: 'entity.subdivision.collection'
-  title: 'List'

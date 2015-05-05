@@ -260,19 +260,4 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    parent::postDelete($storage, $entities);
-
-    // Remove the related subdivisions for each address format.
-    // Ignore all address formats with the syncing flag set, assuming that the
-    // import process will take care of their related subdivisions.
-    $entities = array_filter($entities, function($entity) {
-      return !$entity->isSyncing();
-    });
-    \Drupal::entityManager()->getStorage('subdivision')->deleteChildren($entities);
-  }
-
 }

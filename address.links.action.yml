@@ -3,9 +3,3 @@ entity.address_format.add_form:
   title: 'Add a new address format'
   appears_on:
     - entity.address_format.collection
-
-entity.subdivision.add_form:
-  route_name: entity.subdivision.add_form
-  title: 'Add a new subdivision'
-  appears_on:
-    - entity.subdivision.collection

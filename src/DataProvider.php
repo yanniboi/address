@@ -1,19 +1,25 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\address\DataProvider.
+ */
+
 namespace Drupal\address;
 
 use CommerceGuys\Addressing\Provider\DataProviderInterface;
-use Drupal\Core\Locale\CountryManagerInterface;
+use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Locale\CountryManagerInterface;
 
 /**
- * Exposes Drupal data to the addressing library.
+ * Defines the data provider, a facade in front of different data sources.
  *
- * Note that the methods ignore the $locale parameter because the loaded
- * data is already translated into the current language.
+ * Serves as the single point of contact between the data layer and the
+ * module/underlying library.
  */
-class DataProvider implements DataProviderInterface
-{
+class DataProvider implements DataProviderInterface {
 
   /**
    * The country manager.
@@ -23,11 +29,25 @@ class DataProvider implements DataProviderInterface
   protected $countryManager;
 
   /**
-   * The entity manager.
+   * The address format storage.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
    */
-  protected $entityManager;
+  protected $formatStorage;
+
+  /**
+   * The subdivision repository.
+   *
+   * @var \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface
+   */
+  protected $subdivisionRepository;
+
+  /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
 
   /**
    * Creates a DataProvider instance.
@@ -36,18 +56,24 @@ class DataProvider implements DataProviderInterface
    *   The country manager.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
+   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
+   *   The subdivision repository.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
    */
-  public function __construct(CountryManagerInterface $countryManager, EntityManagerInterface $entityManager) {
+  public function __construct(CountryManagerInterface $countryManager, EntityManagerInterface $entityManager, SubdivisionRepositoryInterface $subdivisionRepository, LanguageManagerInterface $languageManager) {
     $this->countryManager = $countryManager;
-    $this->entityManager = $entityManager;
+    $this->formatStorage = $entityManager->getStorage('address_format');
+    $this->subdivisionRepository = $subdivisionRepository;
+    $this->languageManager = $languageManager;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCountryName($countryCode, $locale = null) {
-    $countries = $this->countryManager->getList();
-    return $countries[$countryCode];
+    $names = $this->getCountryNames($locale);
+    return $names[$countryCode];
   }
 
   /**
@@ -61,30 +87,55 @@ class DataProvider implements DataProviderInterface
    * {@inheritdoc}
    */
   public function getAddressFormat($countryCode, $locale = null) {
-    return $this->entityManager->getStorage('address_format')->load($countryCode);
+    return $this->formatStorage->load($countryCode);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAddressFormats($locale = null) {
-    return $this->entityManager->getStorage('address_format')->loadMultiple();
+    return $this->formatStorage->loadMultiple();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSubdivision($id, $locale = null) {
-    return $this->entityManager->getStorage('subdivision')->load($id);
+    $locale = $this->processLocale($locale);
+    return $this->subdivisionRepository->get($id, $locale);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSubdivisions($countryCode, $parentId = null, $locale = null) {
-    return $this->entityManager->getStorage('subdivision')->loadByProperties(array(
-      'countryCode' => $countryCode,
-      'parentId' => $parentId,
-    ));
+    $locale = $this->processLocale($locale);
+    return $this->subdivisionRepository->getAll($countryCode, $parentId, $locale);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSubdivisionList($countryCode, $parentId = null, $locale = null) {
+    $locale = $this->processLocale($locale);
+    return $this->subdivisionRepository->getList($countryCode, $parentId, $locale);
+  }
+
+  /**
+   * Replaces an empty locale with the one currently active.
+   *
+   * @param string $locale
+   *   The provided locale.
+   *
+   * @return string
+   *   The processed locale.
+   */
+  protected function processLocale($locale) {
+    if (is_null($locale)) {
+      $locale = $this->languageManager->getConfigOverrideLanguage();
+    }
+
+    return $locale;
+  }
+
 }
