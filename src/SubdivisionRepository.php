@@ -47,15 +47,7 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
   }
 
   /**
-   * Loads the subdivision definitions for the provided country code.
-   *
-   * @param string $countryCode
-   *   The country code.
-   * @param int $parentId
-   *   The parent id.
-   *
-   * @return array
-   *   The subdivision definitions.
+   * {@inheritdoc}
    */
   protected function loadDefinitions($countryCode, $parentId = null) {
     // Treat the country code as the parent id on the top level.

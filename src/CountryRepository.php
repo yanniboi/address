@@ -49,11 +49,7 @@ class CountryRepository extends ExternalCountryRepository implements CountryMana
   }
 
   /**
-   * Loads the country definitions for the provided locale.
-   *
-   * @param string $locale The desired locale.
-   *
-   * @return array
+   * {@inheritdoc}
    */
   protected function loadDefinitions($locale) {
     if (isset($this->definitions[$locale])) {
