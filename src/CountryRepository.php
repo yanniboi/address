@@ -9,6 +9,7 @@ namespace Drupal\address;
 
 use CommerceGuys\Intl\Country\CountryRepository as ExternalCountryRepository;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
 
 /**
@@ -26,13 +27,24 @@ class CountryRepository extends ExternalCountryRepository implements CountryMana
   protected $cache;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Creates a CountryRepository instance.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
    */
-  public function __construct(CacheBackendInterface $cache) {
+  public function __construct(CacheBackendInterface $cache, LanguageManagerInterface $languageManager) {
     $this->cache = $cache;
+    $this->languageManager = $languageManager;
+
     parent::__construct();
   }
 
@@ -86,6 +98,13 @@ class CountryRepository extends ExternalCountryRepository implements CountryMana
     }
 
     return $this->baseDefinitions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDefaultLocale() {
+    return $this->languageManager->getConfigOverrideLanguage()->getId();
   }
 
 }

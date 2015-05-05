@@ -25,13 +25,24 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
   protected $cache;
 
   /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
    * Creates a SubdivisionRepository instance.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   The language manager.
    */
-  public function __construct(CacheBackendInterface $cache) {
+  public function __construct(CacheBackendInterface $cache, LanguageManagerInterface $languageManager) {
     $this->cache = $cache;
+    $this->languageManager = $languageManager;
+
     parent::__construct();
   }
 
@@ -68,6 +79,13 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
     }
 
     return $this->definitions[$parentId];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDefaultLocale() {
+    return $this->languageManager->getConfigOverrideLanguage()->getId();
   }
 
 }

@@ -9,11 +9,11 @@ services:
 
   address.country_repository:
     class: Drupal\address\CountryRepository
-    arguments: ['@cache.data']
+    arguments: ['@cache.data', '@language_manager']
 
   address.subdivision_repository:
     class: Drupal\address\SubdivisionRepository
-    arguments: ['@cache.data']
+    arguments: ['@cache.data', '@language_manager']
 
   address.postal_formatter:
     class: CommerceGuys\Addressing\Formatter\PostalFormatter
