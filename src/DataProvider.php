@@ -9,9 +9,9 @@ namespace Drupal\address;
 
 use CommerceGuys\Addressing\Provider\DataProviderInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
+use CommerceGuys\Intl\Country\CountryRepositoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Locale\CountryManagerInterface;
 
 /**
  * Defines the data provider, a facade in front of different data sources.
@@ -22,11 +22,11 @@ use Drupal\Core\Locale\CountryManagerInterface;
 class DataProvider implements DataProviderInterface {
 
   /**
-   * The country manager.
+   * The country repository.
    *
-   * @var \Drupal\Core\Locale\CountryManagerInterface
+   * @var \CommerceGuys\Intl\Country\CountryRepositoryInterface
    */
-  protected $countryManager;
+  protected $countryRepository;
 
   /**
    * The address format storage.
@@ -52,8 +52,8 @@ class DataProvider implements DataProviderInterface {
   /**
    * Creates a DataProvider instance.
    *
-   * @param \Drupal\Core\Locale\CountryManagerInterface $countryManager
-   *   The country manager.
+   * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $countryRepository
+   *   The country repository.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
    *   The entity manager.
    * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
@@ -61,8 +61,8 @@ class DataProvider implements DataProviderInterface {
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
    */
-  public function __construct(CountryManagerInterface $countryManager, EntityManagerInterface $entityManager, SubdivisionRepositoryInterface $subdivisionRepository, LanguageManagerInterface $languageManager) {
-    $this->countryManager = $countryManager;
+  public function __construct(CountryRepositoryInterface $countryRepository, EntityManagerInterface $entityManager, SubdivisionRepositoryInterface $subdivisionRepository, LanguageManagerInterface $languageManager) {
+    $this->countryRepository = $countryRepository;
     $this->formatStorage = $entityManager->getStorage('address_format');
     $this->subdivisionRepository = $subdivisionRepository;
     $this->languageManager = $languageManager;
@@ -80,7 +80,8 @@ class DataProvider implements DataProviderInterface {
    * {@inheritdoc}
    */
   public function getCountryNames($locale = null) {
-    return $this->countryManager->getList();
+    $locale = $this->processLocale($locale);
+    return $this->countryRepository->getList($locale);
   }
 
   /**

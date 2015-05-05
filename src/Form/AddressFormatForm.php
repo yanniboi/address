@@ -12,10 +12,10 @@ use CommerceGuys\Addressing\Enum\AdministrativeAreaType;
 use CommerceGuys\Addressing\Enum\DependentLocalityType;
 use CommerceGuys\Addressing\Enum\LocalityType;
 use CommerceGuys\Addressing\Enum\PostalCodeType;
+use CommerceGuys\Intl\Country\CountryRepositoryInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Locale\CountryManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AddressFormatForm extends EntityForm {
@@ -28,21 +28,23 @@ class AddressFormatForm extends EntityForm {
   protected $storage;
 
   /**
-   * The country manager.
+   * The country repository.
    *
-   * @var \Drupal\Core\Locale\CountryManagerInterface
+   * @var \CommerceGuys\Intl\Country\CountryRepositoryInterface
    */
-  protected $countryManager;
+  protected $countryRepository;
 
   /**
    * Creates an AddressFormatForm instance.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The address format storage.
+   * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $countryRepository
+   *   The country repository.
    */
-  public function __construct(EntityStorageInterface $storage, CountryManagerInterface $countryManager) {
+  public function __construct(EntityStorageInterface $storage, CountryRepositoryInterface $countryRepository) {
     $this->storage = $storage;
-    $this->countryManager = $countryManager;
+    $this->countryRepository = $countryRepository;
   }
 
   /**
@@ -52,7 +54,7 @@ class AddressFormatForm extends EntityForm {
     /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
     $entityManager = $container->get('entity.manager');
 
-    return new static($entityManager->getStorage('address_format'), $container->get('country_manager'));
+    return new static($entityManager->getStorage('address_format'), $container->get('address.country_repository'));
   }
 
   /**
@@ -87,7 +89,7 @@ class AddressFormatForm extends EntityForm {
         '#title' => $this->t('Country'),
         '#default_value' => $addressFormat->getCountryCode(),
         '#required' => TRUE,
-        '#options' => $this->countryManager->getList(),
+        '#options' => $this->countryRepository->getList(),
         '#disabled' => !$addressFormat->isNew(),
       );
     }

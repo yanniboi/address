@@ -5,7 +5,11 @@ services:
 
   address.data_provider:
     class: Drupal\address\DataProvider
-    arguments: ['@country_manager', '@entity.manager', '@address.subdivision_repository', '@language_manager']
+    arguments: ['@address.country_repository', '@entity.manager', '@address.subdivision_repository', '@language_manager']
+
+  address.country_repository:
+    class: Drupal\address\CountryRepository
+    arguments: ['@cache.data']
 
   address.subdivision_repository:
     class: Drupal\address\SubdivisionRepository
