@@ -6,7 +6,7 @@ address.address_format.*:
       type: string
       label: 'Country code'
     format:
-      type: string
+      type: text
       label: 'Format'
     requiredFields:
       type: sequence
@@ -36,34 +36,3 @@ address.address_format.*:
     postalCodePrefix:
       type: string
       label: 'Postal code prefix'
-
-address.subdivisions.*:
-  type: mapping
-  label: 'Subdivisions'
-  mapping:
-    subdivisions:
-      type: sequence
-      label: 'Subdivisions'
-      sequence:
-        - type: address.subdivision.[%key]
-
-address.subdivision.*:
-  type: config_entity
-  label: 'Subdivision'
-  mapping:
-    countryCode:
-      type: string
-      label: 'Country code'
-    parentId:
-      type: string
-      label: 'Parent ID'
-    id:
-      type: string
-      label: 'ID'
-    code:
-      type: string
-      label: 'Code'
-    name:
-      type: label
-      label: 'Name'
-      translatable: true
