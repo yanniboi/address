@@ -125,7 +125,7 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
         'postalCodePrefix' => $addressFormat->getPostalCodePrefix(),
       ];
       $entity = $this->storage->create($values);
-      $entity->save();
+      $entity->trustData()->save();
     }
   }
 

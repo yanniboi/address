@@ -42,6 +42,18 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "collection" = "/admin/config/regional/address-formats",
  *     "edit-form" = "/admin/config/regional/address-formats/manage/{address_format}",
  *     "delete-form" = "/admin/config/regional/address-formats/manage/{address_format}/delete"
+ *   },
+ *   config_export = {
+ *     "countryCode",
+ *     "format",
+ *     "requiredFields",
+ *     "uppercaseFields",
+ *     "administrativeAreaType",
+ *     "localityType",
+ *     "dependentLocalityType",
+ *     "postalCodeType",
+ *     "postalCodePattern",
+ *     "postalCodePrefix"
  *   }
  * )
  */
