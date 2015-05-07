@@ -148,7 +148,7 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
   }
 
   /**
-   * Returns the available library translations.
+   * Gets the available library translations.
    *
    * @return array
    *   An array in the $languageCode => $countryCodes format.

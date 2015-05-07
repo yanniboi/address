@@ -78,7 +78,7 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
   }
 
   /**
-   * Returns the name of the country with the provided code.
+   * Gets the name of the country with the provided code.
    *
    * @param string $countryCode
    *   The country code.
