@@ -16,11 +16,17 @@ use Drupal\Core\Entity\EntityInterface;
 class AddressFormatListBuilder extends ConfigEntityListBuilder {
 
   /**
+   * The number of entities to list per page.
+   *
+   * @var int
+   */
+  protected $limit = 210;
+
+  /**
    * {@inheritdoc}
    */
   public function buildHeader() {
     $header['country'] = $this->t('Country');
-    $header['status'] = $this->t('Status');
 
     return $header + parent::buildHeader();
   }
@@ -30,7 +36,6 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['country'] = $entity->label();
-    $row['status'] = $entity->status() ? $this->t('Enabled') : $this->t('Disabled');
 
     return $row + parent::buildRow($entity);
   }
