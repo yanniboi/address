@@ -132,6 +132,25 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   }
 
   /**
+   * Overrides \Drupal\Core\Entity\Entity::label().
+   */
+  public function label() {
+    if ($this->countryCode == 'ZZ') {
+      return t('Generic');
+    }
+
+    $countries = \Drupal::service('address.country_repository')->getList();
+    if (isset($countries[$this->countryCode])) {
+      $label = $countries[$this->countryCode];
+    }
+    else {
+      $label = $this->countryCode;
+    }
+
+    return $label;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getCountryCode() {
