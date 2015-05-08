@@ -143,6 +143,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
       '#tag' => 'span',
       '#attributes' => ['class' => ['country']],
       '#value' => $this->dataProvider->getCountryName($countryCode),
+      '#placeholder' => '%country',
     ];
     foreach ($addressFormat->getUsedFields() as $field) {
       $property = $this->propertyMapping[$field];
@@ -153,8 +154,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
         '#tag' => 'span',
         '#attributes' => ['class' => [$class]],
         '#value' => $values[$field],
-        // Specifies the format placeholder this field will replace.
-        '#target' => '%' . $field,
+        '#placeholder' => '%' . $field,
       ];
     }
 
@@ -176,24 +176,26 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
   public static function postRender($content, $element) {
     $addressFormat = $element['address_format']['#value'];
     $formatString = $addressFormat->getFormat();
+    // Add the country to the bottom or the top of the format string,
+    // depending on whether the format is minor-to-major or major-to-minor.
+    if (strpos($formatString, AddressField::ADDRESS_LINE1) < strpos($formatString, AddressField::ADDRESS_LINE2)) {
+      $formatString .= "\n" . '%country';
+    }
+    else {
+      $formatString = '%country' . "\n" . $formatString;
+    }
+
     $replacements = [];
     foreach (Element::getVisibleChildren($element) as $key) {
       $child = $element[$key];
-      if (isset($child['#target'])) {
-        $replacements[$child['#target']] = $child['#value'] ? $child['#markup'] : '';
+      if (isset($child['#placeholder'])) {
+        $replacements[$child['#placeholder']] = $child['#value'] ? $child['#markup'] : '';
       }
     }
     $content = self::replacePlaceholders($formatString, $replacements);
-    // Add the country to the bottom or the top, depending on whether the
-    // format is minor-to-major or major-to-minor.
-    if (strpos($formatString, AddressField::ADDRESS_LINE1) < strpos($formatString, AddressField::ADDRESS_LINE2)) {
-      $content .= "\n" . trim($element['country']['#markup']);
-    }
-    else {
-      $content = trim($element['country']['#markup']) . "\n" . $content;
-    }
+    $content = nl2br($content, FALSE);
 
-    return nl2br($content, FALSE);
+    return $content;
   }
 
   /**
