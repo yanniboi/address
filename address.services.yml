@@ -14,7 +14,3 @@ services:
   address.subdivision_repository:
     class: Drupal\address\SubdivisionRepository
     arguments: ['@cache.data', '@language_manager']
-
-  address.postal_formatter:
-    class: CommerceGuys\Addressing\Formatter\PostalFormatter
-    arguments: ['@address.data_provider']
