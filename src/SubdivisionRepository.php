@@ -9,6 +9,7 @@ namespace Drupal\address;
 
 use CommerceGuys\Addressing\Repository\SubdivisionRepository as ExternalSubdivisionRepository;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Defines the subdivision repository.
