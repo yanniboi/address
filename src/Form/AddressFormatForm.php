@@ -77,58 +77,58 @@ class AddressFormatForm extends EntityForm {
 
     $countryCode = $addressFormat->getCountryCode();
     if ($countryCode == 'ZZ') {
-      $form['countryCode'] = array(
+      $form['countryCode'] = [
         '#type' => 'item',
         '#title' => $this->t('Country'),
         '#markup' => $this->t('Generic'),
-      );
+      ];
     }
     else {
-      $form['countryCode'] = array(
+      $form['countryCode'] = [
         '#type' => 'select',
         '#title' => $this->t('Country'),
         '#default_value' => $addressFormat->getCountryCode(),
         '#required' => TRUE,
         '#options' => $this->countryRepository->getList(),
         '#disabled' => !$addressFormat->isNew(),
-      );
+      ];
     }
 
-    $form['format'] = array(
+    $form['format'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Format'),
-      '#description' => $this->t('Available tokens: @tokens', array('@tokens' => implode(', ', AddressField::getTokens()))),
+      '#description' => $this->t('Available tokens: @tokens', ['@tokens' => implode(', ', AddressField::getTokens())]),
       '#default_value' => $addressFormat->getFormat(),
       '#required' => TRUE,
-    );
-    $form['requiredFields'] = array(
+    ];
+    $form['requiredFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Required fields'),
       '#options' => $fields,
       '#default_value' => $addressFormat->getRequiredFields(),
-    );
-    $form['uppercaseFields'] = array(
+    ];
+    $form['uppercaseFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Uppercase fields'),
       '#description' => t('Uppercased on envelopes to faciliate automatic post handling.'),
       '#options' => $fields,
       '#default_value' => $addressFormat->getUppercaseFields(),
-    );
-    $form['postalCodePattern'] = array(
+    ];
+    $form['postalCodePattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Postal code pattern'),
       '#description' => $this->t('Regular expression used to validate postal codes.'),
       '#default_value' => $addressFormat->getPostalCodePattern(),
-    );
-    $form['postalCodePrefix'] = array(
+    ];
+    $form['postalCodePrefix'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Postal code prefix'),
       '#description' => $this->t('Added to postal codes when formatting an address for international mailing.'),
       '#default_value' => $addressFormat->getPostalCodePrefix(),
       '#size' => 5,
-    );
+    ];
 
-    $form['postalCodeType'] = array(
+    $form['postalCodeType'] = [
       '#type' => 'select',
       '#title' => $this->t('Postal code type'),
       '#default_value' => $addressFormat->getPostalCodeType(),
@@ -138,8 +138,8 @@ class AddressFormatForm extends EntityForm {
         PostalCodeType::PIN => $this->t('Pin'),
       ],
       '#empty_value' => '',
-    );
-    $form['dependentLocalityType'] = array(
+    ];
+    $form['dependentLocalityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Dependent locality type'),
       '#default_value' => $addressFormat->getDependentLocalityType(),
@@ -150,8 +150,8 @@ class AddressFormatForm extends EntityForm {
         DependentLocalityType::SUBURB => $this->t('Suburb'),
       ],
       '#empty_value' => '',
-    );
-    $form['localityType'] = array(
+    ];
+    $form['localityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Locality type'),
       '#default_value' => $addressFormat->getLocalityType(),
@@ -161,8 +161,8 @@ class AddressFormatForm extends EntityForm {
         LocalityType::POST_TOWN => t('Post town'),
       ],
       '#empty_value' => '',
-    );
-    $form['administrativeAreaType'] = array(
+    ];
+    $form['administrativeAreaType'] = [
       '#type' => 'select',
       '#title' => $this->t('Administrative area type'),
       '#default_value' => $addressFormat->getAdministrativeAreaType(),
@@ -181,7 +181,7 @@ class AddressFormatForm extends EntityForm {
         AdministrativeAreaType::STATE => $this->t('State'),
       ],
       '#empty_value' => '',
-    );
+    ];
 
     return $form;
   }
@@ -211,7 +211,7 @@ class AddressFormatForm extends EntityForm {
     foreach ($requirements as $token => $requiredField) {
       if (strpos($format, $token) !== FALSE && !$formState->getValue($requiredField)) {
         $title = $form[$requiredField]['#title'];
-        $formState->setErrorByName($requiredField, $this->t('%title is required.', array('%title' => $title)));
+        $formState->setErrorByName($requiredField, $this->t('%title is required.', ['%title' => $title]));
       }
     }
   }
@@ -222,9 +222,9 @@ class AddressFormatForm extends EntityForm {
   public function save(array $form, FormStateInterface $formState) {
     $addressFormat = $this->entity;
     $addressFormat->save();
-    drupal_set_message($this->t('Saved the %label address format.', array(
+    drupal_set_message($this->t('Saved the %label address format.', [
       '%label' => $addressFormat->label(),
-    )));
+    ]));
     $formState->setRedirectUrl($addressFormat->urlInfo('collection'));
   }
 

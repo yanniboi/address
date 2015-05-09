@@ -90,7 +90,7 @@ class DataProvider implements DataProviderInterface {
   public function getAddressFormat($countryCode, $locale = null) {
     if ($locale) {
       $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
-      $this->languageManager->setConfigOverrideLanguage(new Language(array('id' => $locale)));
+      $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $locale]));
       $addressFormat = $this->formatStorage->load($countryCode);
       $this->languageManager->setConfigOverrideLanguage($originalLanguage);
     }
@@ -107,7 +107,7 @@ class DataProvider implements DataProviderInterface {
   public function getAddressFormats($locale = null) {
     if ($locale) {
       $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
-      $this->languageManager->setConfigOverrideLanguage(new Language(array('id' => $locale)));
+      $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $locale]));
       $addressFormats = $this->formatStorage->loadMultiple();
       $this->languageManager->setConfigOverrideLanguage($originalLanguage);
     }

@@ -22,7 +22,7 @@ class AddressFormatTest extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('system', 'user', 'address');
+  public static $modules = ['system', 'user', 'address'];
 
   /**
    *
@@ -48,9 +48,9 @@ class AddressFormatTest extends WebTestBase {
       break;
     }
 
-    $values = array(
+    $values = [
       'countryCode' => $countryCode,
-    );
+    ];
 
     $addressFormat = entity_create('address_format', $values);
     $addressFormat->save();
@@ -67,7 +67,7 @@ class AddressFormatTest extends WebTestBase {
     $this->assertTrue($addressFormatExists, 'The new address format has been created in the database.');
 
     // Login a test user.
-    $webUser = $this->drupalCreateUser(array('administer address formats'));
+    $webUser = $this->drupalCreateUser(['administer address formats']);
     $this->drupalLogin($webUser);
     // Visit the address format edit page.
     $this->drupalGet('admin/config/regional/address-format/' . $addressFormat->id());
@@ -81,7 +81,7 @@ class AddressFormatTest extends WebTestBase {
     $countryCodes = array_keys(CountryManager::getStandardList());
 
     // Login a test user.
-    $webUser = $this->drupalCreateUser(array('administer address formats'));
+    $webUser = $this->drupalCreateUser(['administer address formats']);
     $this->drupalLogin($webUser);
     // Find a random countryCode that doesn't exist yet.
     while ($key = array_rand($countryCodes)) {
@@ -92,9 +92,9 @@ class AddressFormatTest extends WebTestBase {
       break;
     }
 
-    $edit = array(
+    $edit = [
       'countryCode' => $countryCode,
-    );
+    ];
     $this->drupalPostForm('admin/config/regional/address-format/import', $edit, t('Import'));
 
     $this->drupalGet('admin/config/regional/address-format/' . $countryCode);

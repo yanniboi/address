@@ -4,14 +4,13 @@
  * Implements hook_requirements().
  */
 function address_requirements($phase) {
-  $requirements = array();
-
+  $requirements = [];
   if ($phase == 'install') {
     if (!class_exists('\CommerceGuys\Addressing\Repository\AddressFormatRepository')) {
-      $requirements['addressing_library'] = array(
+      $requirements['addressing_library'] = [
         'description' => t('Address requires the commerceguys/addressing library.'),
         'severity' => REQUIREMENT_ERROR,
-      );
+      ];
     }
   }
 

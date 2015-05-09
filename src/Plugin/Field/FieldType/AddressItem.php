@@ -30,50 +30,50 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $fieldDefinition) {
-    return array(
-      'columns' => array(
-        'country_code' => array(
+    return [
+      'columns' => [
+        'country_code' => [
           'type' => 'varchar',
           'length' => 2,
-        ),
-        'administrative_area' => array(
+        ],
+        'administrative_area' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'locality' => array(
+        ],
+        'locality' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'dependent_locality' => array(
+        ],
+        'dependent_locality' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'postal_code' => array(
+        ],
+        'postal_code' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'sorting_code' => array(
+        ],
+        'sorting_code' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'address_line1' => array(
+        ],
+        'address_line1' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'address_line2' => array(
+        ],
+        'address_line2' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'organization' => array(
+        ],
+        'organization' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-        'recipient' => array(
+        ],
+        'recipient' => [
           'type' => 'varchar',
           'length' => 255,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**
