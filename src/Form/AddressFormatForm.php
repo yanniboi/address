@@ -8,11 +8,8 @@
 namespace Drupal\address\Form;
 
 use CommerceGuys\Addressing\Enum\AddressField;
-use CommerceGuys\Addressing\Enum\AdministrativeAreaType;
-use CommerceGuys\Addressing\Enum\DependentLocalityType;
-use CommerceGuys\Addressing\Enum\LocalityType;
-use CommerceGuys\Addressing\Enum\PostalCodeType;
 use CommerceGuys\Intl\Country\CountryRepositoryInterface;
+use Drupal\address\LabelHelper;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -63,18 +60,6 @@ class AddressFormatForm extends EntityForm {
   public function form(array $form, FormStateInterface $formState) {
     $form = parent::form($form, $formState);
     $addressFormat = $this->entity;
-    $fields = [
-      AddressField::RECIPIENT => $this->t('Recipient'),
-      AddressField::ORGANIZATION => $this->t('Organization'),
-      AddressField::ADDRESS_LINE1 => $this->t('Address line 1'),
-      AddressField::ADDRESS_LINE2 => $this->t('Address line 2'),
-      AddressField::SORTING_CODE => $this->t('Sorting code'),
-      AddressField::POSTAL_CODE => $this->t('Postal code'),
-      AddressField::DEPENDENT_LOCALITY => $this->t('Dependent locality'),
-      AddressField::LOCALITY => $this->t('Locality'),
-      AddressField::ADMINISTRATIVE_AREA => $this->t('Administrative area'),
-    ];
-
     $countryCode = $addressFormat->getCountryCode();
     if ($countryCode == 'ZZ') {
       $form['countryCode'] = [
@@ -104,14 +89,14 @@ class AddressFormatForm extends EntityForm {
     $form['requiredFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Required fields'),
-      '#options' => $fields,
+      '#options' => LabelHelper::getGenericFieldLabels(),
       '#default_value' => $addressFormat->getRequiredFields(),
     ];
     $form['uppercaseFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Uppercase fields'),
       '#description' => t('Uppercased on envelopes to faciliate automatic post handling.'),
-      '#options' => $fields,
+      '#options' => LabelHelper::getGenericFieldLabels(),
       '#default_value' => $addressFormat->getUppercaseFields(),
     ];
     $form['postalCodePattern'] = [
@@ -132,54 +117,28 @@ class AddressFormatForm extends EntityForm {
       '#type' => 'select',
       '#title' => $this->t('Postal code type'),
       '#default_value' => $addressFormat->getPostalCodeType(),
-      '#options' =>  [
-        PostalCodeType::POSTAL => $this->t('Postal'),
-        PostalCodeType::ZIP => $this->t('Zip'),
-        PostalCodeType::PIN => $this->t('Pin'),
-      ],
+      '#options' =>  LabelHelper::getPostalCodeLabels(),
       '#empty_value' => '',
     ];
     $form['dependentLocalityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Dependent locality type'),
       '#default_value' => $addressFormat->getDependentLocalityType(),
-      '#options' => [
-        DependentLocalityType::DISTRICT => $this->t('District'),
-        DependentLocalityType::NEIGHBORHOOD => $this->t('Neighborhood'),
-        DependentLocalityType::VILLAGE_TOWNSHIP => $this->t('Village township'),
-        DependentLocalityType::SUBURB => $this->t('Suburb'),
-      ],
+      '#options' => LabelHelper::getDependentLocalityLabels(),
       '#empty_value' => '',
     ];
     $form['localityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Locality type'),
       '#default_value' => $addressFormat->getLocalityType(),
-      '#options' => [
-        LocalityType::CITY => t('City'),
-        LocalityType::DISTRICT => t('District'),
-        LocalityType::POST_TOWN => t('Post town'),
-      ],
+      '#options' => LabelHelper::getLocalityLabels(),
       '#empty_value' => '',
     ];
     $form['administrativeAreaType'] = [
       '#type' => 'select',
       '#title' => $this->t('Administrative area type'),
       '#default_value' => $addressFormat->getAdministrativeAreaType(),
-      '#options' => [
-        AdministrativeAreaType::AREA => $this->t('Area'),
-        AdministrativeAreaType::COUNTY => $this->t('County'),
-        AdministrativeAreaType::DEPARTMENT => $this->t('Department'),
-        AdministrativeAreaType::DISTRICT => $this->t('District'),
-        AdministrativeAreaType::DO_SI => $this->t('Do si'),
-        AdministrativeAreaType::EMIRATE => $this->t('Emirate'),
-        AdministrativeAreaType::ISLAND => $this->t('Island'),
-        AdministrativeAreaType::OBLAST => $this->t('Oblast'),
-        AdministrativeAreaType::PARISH => $this->t('Parish'),
-        AdministrativeAreaType::PREFECTURE => $this->t('Prefecture'),
-        AdministrativeAreaType::PROVINCE => $this->t('Province'),
-        AdministrativeAreaType::STATE => $this->t('State'),
-      ],
+      '#options' => LabelHelper::getAdministrativeAreaLabels(),
       '#empty_value' => '',
     ];
 
