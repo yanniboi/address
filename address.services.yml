@@ -3,9 +3,9 @@ services:
     class: Drupal\address\AddressFormatImporter
     arguments: ['@entity.manager', '@language_manager']
 
-  address.data_provider:
-    class: Drupal\address\DataProvider
-    arguments: ['@address.country_repository', '@entity.manager', '@address.subdivision_repository', '@language_manager']
+  address.address_format_repository:
+    class: Drupal\address\AddressFormatRepository
+    arguments: ['@entity.manager', '@language_manager']
 
   address.country_repository:
     class: Drupal\address\CountryRepository

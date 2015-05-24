@@ -9,7 +9,9 @@ namespace Drupal\address\Plugin\Field\FieldFormatter;
 
 use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Model\AddressInterface;
-use CommerceGuys\Addressing\Provider\DataProviderInterface;
+use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
+use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
+use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -31,11 +33,25 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The data provider.
+   * The address format repository.
    *
-   * @var \CommerceGuys\Addressing\Provider\DataProviderInterface
+   * @var \CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface
    */
-  protected $dataProvider;
+  protected $addressFormatRepository;
+
+  /**
+   * The country repository.
+   *
+   * @var \CommerceGuys\Addressing\Repository\CountryRepositoryInterface
+   */
+  protected $countryRepository;
+
+  /**
+   * The subdivision repository.
+   *
+   * @var \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface
+   */
+  protected $subdivisionRepository;
 
   /**
    * Maps AddressField values to their matching properties.
@@ -71,13 +87,19 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *   The view mode.
    * @param array $thirdPartySettings
    *   Any third party settings.
-   * @param \CommerceGuys\Addressing\Provider\DataProviderInterface $dataProvider
-   *   The data provider.
+   * @param \CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface $addressFormatRepository
+   *   The address format repository.
+   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $countryRepository
+   *   The country repository.
+   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
+   *   The subdivision repository.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, DataProviderInterface $dataProvider) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
 
-    $this->dataProvider = $dataProvider;
+    $this->addressFormatRepository = $addressFormatRepository;
+    $this->countryRepository = $countryRepository;
+    $this->subdivisionRepository = $subdivisionRepository;
   }
 
   /**
@@ -93,7 +115,9 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('address.data_provider')
+      $container->get('address.address_format_repository'),
+      $container->get('address.country_repository'),
+      $container->get('address.subdivision_repository')
     );
   }
 
@@ -128,7 +152,8 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
   protected function viewElement(AddressInterface $address) {
     $values = $this->getValues($address);
     $countryCode = $address->getCountryCode();
-    $addressFormat = $this->dataProvider->getAddressFormat($countryCode, $address->getLocale());
+    $addressFormat = $this->addressFormatRepository->get($countryCode, $address->getLocale());
+    $countries = $this->countryRepository->getList();
 
     $element = [];
     $element['address_format'] = [
@@ -143,7 +168,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
       '#type' => 'html_tag',
       '#tag' => 'span',
       '#attributes' => ['class' => ['country']],
-      '#value' => $this->dataProvider->getCountryName($countryCode),
+      '#value' => $countries[$countryCode],
       '#placeholder' => '%country',
     ];
     foreach ($addressFormat->getUsedFields() as $field) {
@@ -255,7 +280,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
         // This level is empty, so there can be no sublevels.
         break;
       }
-      $subdivision = $this->dataProvider->getSubdivision($values[$field], $address->getLocale());
+      $subdivision = $this->subdivisionRepository->get($values[$field], $address->getLocale());
       if (!$subdivision) {
         // This level has no predefined subdivisions, stop.
         break;

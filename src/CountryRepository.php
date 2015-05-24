@@ -8,6 +8,7 @@
 namespace Drupal\address;
 
 use CommerceGuys\Intl\Country\CountryRepository as ExternalCountryRepository;
+use CommerceGuys\Addressing\Repository\CountryRepositoryInterface as AddressingCountryRepositoryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
@@ -17,7 +18,7 @@ use Drupal\Core\Locale\CountryManagerInterface;
  *
  * Countries are stored on disk in JSON and cached inside Drupal.
  */
-class CountryRepository extends ExternalCountryRepository implements CountryManagerInterface {
+class CountryRepository extends ExternalCountryRepository implements AddressingCountryRepositoryInterface, CountryManagerInterface {
 
   /**
    * The cache backend.
