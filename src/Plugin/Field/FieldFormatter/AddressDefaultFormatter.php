@@ -12,6 +12,7 @@ use CommerceGuys\Addressing\Model\AddressInterface;
 use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
+use Drupal\address\FieldHelper;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -52,23 +53,6 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    * @var \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface
    */
   protected $subdivisionRepository;
-
-  /**
-   * Maps AddressField values to their matching properties.
-   *
-   * @var array
-   */
-  protected $propertyMapping = [
-    'administrativeArea' => 'administrative_area',
-    'locality' => 'locality',
-    'dependentLocality' => 'dependent_locality',
-    'postalCode' => 'postal_code',
-    'sortingCode' => 'sorting_code',
-    'addressLine1' => 'address_line1',
-    'addressLine2' => 'address_line2',
-    'organization' => 'organization',
-    'recipient' => 'recipient',
-  ];
 
   /**
    * Constructs an AddressDefaultFormatter object.
@@ -172,7 +156,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
       '#placeholder' => '%country',
     ];
     foreach ($addressFormat->getUsedFields() as $field) {
-      $property = $this->propertyMapping[$field];
+      $property = FieldHelper::getPropertyName($field);
       $class = str_replace('_', '-', $property);
 
       $element[$property] = [
