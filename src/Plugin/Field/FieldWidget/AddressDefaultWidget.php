@@ -7,6 +7,7 @@
 
 namespace Drupal\address\Plugin\Field\FieldWidget;
 
+use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
@@ -19,6 +20,7 @@ use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -54,6 +56,19 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    * @var \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface
    */
   protected $subdivisionRepository;
+
+  /**
+   * The size attributes for fields likely to be inlined.
+   *
+   * @var array
+   */
+  protected $sizeAttributes = [
+    AddressField::ADMINISTRATIVE_AREA => 30,
+    AddressField::LOCALITY => 30,
+    AddressField::DEPENDENT_LOCALITY => 30,
+    AddressField::POSTAL_CODE => 10,
+    AddressField::SORTING_CODE => 10,
+  ];
 
   /**
    * Constructs a AddressDefaultWidget object.
@@ -105,7 +120,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
     $fieldName = $this->fieldDefinition->getName();
-    $idPrefix = implode('-', array_merge($element['#field_parents'], array($fieldName)));
+    $idPrefix = implode('-', array_merge($element['#field_parents'], [$fieldName]));
     $wrapperId = Html::getUniqueId($idPrefix . '-ajax-wrapper');
     // If the form has been rebuilt via AJAX, use the values from user input.
     // $formState->getValues() can't be used here because it's empty due to
@@ -122,6 +137,14 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       '#open' => TRUE,
       '#prefix' => '<div id="' . $wrapperId . '">',
       '#suffix' => '</div>',
+      '#pre_render' => [
+        ['Drupal\Core\Render\Element\Details', 'preRenderDetails'],
+        ['Drupal\Core\Render\Element\Details', 'preRenderGroup'],
+        [get_class($this), 'groupElements'],
+      ],
+      '#attached' => [
+        'library' => ['address/form'],
+      ],
       // Pass the id along to other methods.
       '#wrapper_id' => $wrapperId,
     ];
@@ -166,10 +189,19 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   protected function addressElements(array $element, array $values) {
     $addressFormat = $this->addressFormatRepository->get($values['country_code']);
     $requiredFields = $addressFormat->getRequiredFields();
-    $groupedFields = $addressFormat->getGroupedFields();
     $labels = LabelHelper::getFieldLabels($addressFormat);
-    foreach ($groupedFields as $lineFields) {
-      foreach ($lineFields as $field) {
+    foreach ($addressFormat->getGroupedFields() as $lineIndex => $lineFields) {
+      if (count($lineFields) > 1) {
+        // Used by the #pre_render callback to group fields inline.
+        $element['container' . $lineIndex] = [
+          '#type' => 'container',
+          '#attributes' => [
+            'class' => ['address-container-inline'],
+          ],
+        ];
+      }
+
+      foreach ($lineFields as $fieldIndex => $field) {
         $property = FieldHelper::getPropertyName($field);
         $class = str_replace('_', '-', $property);
 
@@ -178,11 +210,15 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
           '#title' => $labels[$field],
           '#default_value' => $values[$property],
           '#required' => in_array($field, $requiredFields),
+          '#size' => isset($this->sizeAttributes[$field]) ? $this->sizeAttributes[$field] : 60,
           '#attributes' => [
             'class' => [$class],
             'autocomplete' => FieldHelper::getAutocompleteAttribute($field),
           ],
         ];
+        if (count($lineFields) > 1) {
+          $element[$property]['#group'] = $lineIndex;
+        }
       }
     }
     // Hide the label for the second address line.
@@ -236,12 +272,39 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element[$property]['#type'] = 'select';
       $element[$property]['#options'] = $subdivisions;
       $element[$property]['#empty_value'] = '';
+      unset($element[$property]['#size']);
       if ($currentDepth < $depth) {
         $element[$property]['#ajax'] = [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $element['#wrapper_id'],
         ];
       }
+    }
+
+    return $element;
+  }
+
+  /**
+   * Groups elements with the same #group so that they can be inlined.
+   */
+  public static function groupElements(array $element) {
+    $sort = [];
+    foreach (Element::getVisibleChildren($element) as $key) {
+      if (isset($element[$key]['#group'])) {
+        // Copy the element to the container and remove the original.
+        $groupIndex = $element[$key]['#group'];
+        $containerKey = 'container' . $groupIndex;
+        $element[$containerKey][$key] = $element[$key];
+        unset($element[$key]);
+        // Mark the container for sorting.
+        if (!in_array($containerKey, $sort)) {
+          $sort[] = $containerKey;
+        }
+      }
+    }
+    // Sort the moved elements, so that their #weight stays respected.
+    foreach ($sort as $key) {
+      uasort($element[$key], array('Drupal\Component\Utility\SortArray', 'sortByWeightProperty'));
     }
 
     return $element;
