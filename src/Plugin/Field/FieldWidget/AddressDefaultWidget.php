@@ -246,7 +246,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $depth = $this->subdivisionRepository->getDepth($values['country_code']);
     if (!isset($element['administrative_area']) || $depth === 0) {
       // No subdivision fields or no predefined data found.
-      return;
+      return $element;
     }
 
     // Add a parent id to each found subdivision element.
