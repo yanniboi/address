@@ -60,6 +60,11 @@ class AddressFormatRepository implements AddressFormatRepositoryInterface {
       $addressFormat = $this->formatStorage->load($countryCode);
     }
 
+    if (!$addressFormat) {
+      // No format found for the given country code, fallback to ZZ.
+      $addressFormat = $this->formatStorage->load('ZZ');
+    }
+
     return $addressFormat;
   }
 
