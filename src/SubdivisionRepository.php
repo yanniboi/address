@@ -50,6 +50,25 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
   /**
    * {@inheritdoc}
    */
+  public function getDepth($countryCode) {
+    if (empty($this->depths)) {
+      $cacheKey = 'address.subdivisions.depths';
+      if ($cached = $this->cache->get($cacheKey)) {
+        $this->depths = $cached->data;
+      }
+      else {
+        $filename = $this->definitionPath . 'depths.json';
+        $this->depths = json_decode(file_get_contents($filename), true);
+        $this->cache->set($cacheKey, $this->depths, CacheBackendInterface::CACHE_PERMANENT, ['subdivisions']);
+      }
+    }
+
+    return isset($this->depths[$countryCode]) ? $this->depths[$countryCode] : 0;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function loadDefinitions($countryCode, $parentId = null) {
     // Treat the country code as the parent id on the top level.
     $parentId = $parentId ?: $countryCode;

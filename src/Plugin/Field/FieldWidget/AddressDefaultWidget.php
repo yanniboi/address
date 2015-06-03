@@ -207,8 +207,9 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The processed form element array.
    */
   protected function processSubdivisionElements(array $element, array $values) {
-    if (!isset($element['administrative_area'])) {
-      // The current format doesn't have any subdivision fields.
+    $depth = $this->subdivisionRepository->getDepth($values['country_code']);
+    if (!isset($element['administrative_area']) || $depth === 0) {
+      // No subdivision fields or no predefined data found.
       return;
     }
 
@@ -221,7 +222,8 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element['dependent_locality']['#parent_id'] = $values['locality'];
     }
     // Load and insert the subdivisions for each parent id.
-    foreach (['administrative_area', 'locality', 'dependent_locality'] as $property) {
+    foreach (['administrative_area', 'locality', 'dependent_locality'] as $index => $property) {
+      $currentDepth = $index + 1;
       $parentId = $element[$property]['#parent_id'];
       if ($parentId === '') {
         break;
@@ -234,8 +236,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element[$property]['#type'] = 'select';
       $element[$property]['#options'] = $subdivisions;
       $element[$property]['#empty_value'] = '';
-      if (in_array($property, ['administrative_area', 'locality'])) {
-        // @todo Add a way to know whether the next level has any subdivisions.
+      if ($currentDepth < $depth) {
         $element[$property]['#ajax'] = [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $element['#wrapper_id'],
