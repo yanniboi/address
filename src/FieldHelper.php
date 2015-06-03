@@ -25,15 +25,15 @@ class FieldHelper {
    */
   public static function getPropertyName($field) {
     $propertyMapping = [
-      'administrativeArea' => 'administrative_area',
-      'locality' => 'locality',
-      'dependentLocality' => 'dependent_locality',
-      'postalCode' => 'postal_code',
-      'sortingCode' => 'sorting_code',
-      'addressLine1' => 'address_line1',
-      'addressLine2' => 'address_line2',
-      'organization' => 'organization',
-      'recipient' => 'recipient',
+      AddressField::ADMINISTRATIVE_AREA => 'administrative_area',
+      AddressField::LOCALITY => 'locality',
+      AddressField::DEPENDENT_LOCALITY => 'dependent_locality',
+      AddressField::POSTAL_CODE => 'postal_code',
+      AddressField::SORTING_CODE => 'sorting_code',
+      AddressField::ADDRESS_LINE1 => 'address_line1',
+      AddressField::ADDRESS_LINE2 => 'address_line2',
+      AddressField::ORGANIZATION => 'organization',
+      AddressField::RECIPIENT => 'recipient',
     ];
 
     return isset($propertyMapping[$field]) ? $propertyMapping[$field] : NULL;
@@ -52,15 +52,15 @@ class FieldHelper {
    */
   public static function getAutocompleteAttribute($field) {
     $autocompleteMapping = [
-      'administrativeArea' => 'address-level1',
-      'locality' => 'address-level2',
-      'dependentLocality' => 'address-level3',
-      'postalCode' => 'postal_code',
-      'sortingCode' => 'sorting_code',
-      'addressLine1' => 'address_line1',
-      'addressLine2' => 'address_line2',
-      'organization' => 'organization',
-      'recipient' => 'name',
+      AddressField::ADMINISTRATIVE_AREA => 'address-level1',
+      AddressField::LOCALITY => 'address-level2',
+      AddressField::DEPENDENT_LOCALITY => 'address-level3',
+      AddressField::POSTAL_CODE => 'postal_code',
+      AddressField::SORTING_CODE => 'sorting_code',
+      AddressField::ADDRESS_LINE1 => 'address_line1',
+      AddressField::ADDRESS_LINE2 => 'address_line2',
+      AddressField::ORGANIZATION => 'organization',
+      AddressField::RECIPIENT => 'name',
     ];
 
     return isset($autocompleteMapping[$field]) ? $autocompleteMapping[$field] : NULL;
