@@ -61,7 +61,7 @@ class AddressFormatTest extends WebTestBase {
    * Tests creating a address format programmatically.
    */
   function testAddressFormatCreationProgramatically() {
-    // Create a address format type programmaticaly.
+    // Create a address format type programmatically.
     $addressFormat = $this->createRandomAddressFormat();
     $addressFormatExists = (bool) entity_load('address_format', $addressFormat->id());
     $this->assertTrue($addressFormatExists, 'The new address format has been created in the database.');
@@ -70,34 +70,7 @@ class AddressFormatTest extends WebTestBase {
     $webUser = $this->drupalCreateUser(['administer address formats']);
     $this->drupalLogin($webUser);
     // Visit the address format edit page.
-    $this->drupalGet('admin/config/regional/address-format/' . $addressFormat->id());
-    $this->assertResponse(200, 'The new address format can be accessed at admin/config/regional/address-format.');
-  }
-
-  /**
-   * Tests creating a address format via the import form.
-   */
-  function testAddressFormatCreationImportForm() {
-    $countryCodes = array_keys(CountryManager::getStandardList());
-
-    // Login a test user.
-    $webUser = $this->drupalCreateUser(['administer address formats']);
-    $this->drupalLogin($webUser);
-    // Find a random countryCode that doesn't exist yet.
-    while ($key = array_rand($countryCodes)) {
-      if (entity_load('address_format', $countryCodes[$key])) {
-        continue;
-      }
-      $countryCode = $countryCodes[$key];
-      break;
-    }
-
-    $edit = [
-      'countryCode' => $countryCode,
-    ];
-    $this->drupalPostForm('admin/config/regional/address-format/import', $edit, t('Import'));
-
-    $this->drupalGet('admin/config/regional/address-format/' . $countryCode);
-    $this->assertResponse(200, 'The new address format can be accessed at admin/config/regional/address-format.');
+    $this->drupalGet('admin/config/regional/address-formats/manage/' . $addressFormat->id());
+    $this->assertResponse(200, 'The new address format can be accessed at admin/config/regional/address-formats.');
   }
 }
