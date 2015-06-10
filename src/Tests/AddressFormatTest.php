@@ -7,6 +7,7 @@
 
 namespace Drupal\address\Tests;
 
+use Drupal\address\Entity\AddressFormat;
 use Drupal\Core\Locale\CountryManager;
 use Drupal\simpletest\WebTestBase;
 
@@ -52,7 +53,8 @@ class AddressFormatTest extends WebTestBase {
       'countryCode' => $countryCode,
     ];
 
-    $addressFormat = entity_create('address_format', $values);
+    $addressFormat = AddressFormat::create($values);
+
     $addressFormat->save();
     return $addressFormat;
   }
