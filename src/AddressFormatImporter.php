@@ -73,8 +73,7 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
       'init_message' => t('Preparing to import...'),
       'operations' => $operations,
     ]);
-
-    // Check that the drush exists, then process using drush.
+    // Drush requres the batch to be started manually.
     if (PHP_SAPI === 'cli' && function_exists("drush_backend_batch_process")) {
       drush_backend_batch_process();
     }
