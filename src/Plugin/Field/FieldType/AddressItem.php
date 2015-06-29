@@ -13,6 +13,7 @@ use Drupal\address\LabelHelper;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -83,7 +84,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
     $properties['country_code'] = DataDefinition::create('string')
-      ->setLabel(t('The two-letter country code.'));
+      ->setLabel(t('The two-letter country code.'))
+      ->addConstraint('Country');
     $properties['administrative_area'] = DataDefinition::create('string')
       ->setLabel(t('The top-level administrative subdivision of the country.'));
     $properties['locality'] = DataDefinition::create('string')
@@ -130,6 +132,18 @@ class AddressItem extends FieldItemBase implements AddressInterface {
     ];
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints() {
+    $constraints = parent::getConstraints();
+    $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
+    $enabledFields = array_filter($this->getSetting('fields'));
+    $constraints[] = $manager->create('AddressFormat', ['fields' => $enabledFields]);
+
+    return $constraints;
   }
 
   /**
