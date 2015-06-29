@@ -36,3 +36,13 @@ address.address_format.*:
     postalCodePrefix:
       type: string
       label: 'Postal code prefix'
+
+field.field_settings.address:
+  type: mapping
+  label: 'Address field settings'
+  mapping:
+    fields:
+      type: sequence
+      label: 'Used fields'
+      sequence:
+        - type: string
