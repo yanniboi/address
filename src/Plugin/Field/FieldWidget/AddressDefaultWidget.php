@@ -208,7 +208,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         $element[$property] = [
           '#type' => 'textfield',
           '#title' => $labels[$field],
-          '#default_value' => $values[$property],
+          '#default_value' => isset($values[$property]) ? $values[$property] : '',
           '#required' => in_array($field, $requiredFields),
           '#size' => isset($this->sizeAttributes[$field]) ? $this->sizeAttributes[$field] : 60,
           '#attributes' => [
@@ -251,19 +251,18 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
 
     // Add a parent id to each found subdivision element.
     $element['administrative_area']['#parent_id'] = 0;
-    if (isset($element['locality'])) {
+    if (isset($element['locality']) && !empty($values['administrative_area'])) {
       $element['locality']['#parent_id'] = $values['administrative_area'];
     }
-    if (isset($element['dependent_locality'])) {
+    if (isset($element['dependent_locality']) && !empty($values['locality'])) {
       $element['dependent_locality']['#parent_id'] = $values['locality'];
     }
     // Load and insert the subdivisions for each parent id.
     foreach (['administrative_area', 'locality', 'dependent_locality'] as $index => $property) {
-      $currentDepth = $index + 1;
-      $parentId = $element[$property]['#parent_id'];
-      if ($parentId === '') {
+      if (!isset($element[$property]['#parent_id'])) {
         break;
       }
+      $parentId = $element[$property]['#parent_id'];
       $subdivisions = $this->subdivisionRepository->getList($values['country_code'], $parentId);
       if (empty($subdivisions)) {
         break;
@@ -273,6 +272,8 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element[$property]['#options'] = $subdivisions;
       $element[$property]['#empty_value'] = '';
       unset($element[$property]['#size']);
+
+      $currentDepth = $index + 1;
       if ($currentDepth < $depth) {
         $element[$property]['#ajax'] = [
           'callback' => [get_class($this), 'ajaxRefresh'],
