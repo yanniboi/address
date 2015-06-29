@@ -225,6 +225,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     if (isset($element['address_line2'])) {
       $element['address_line2']['#title_display'] = 'invisible';
     }
+    // Hide fields that have been disabled in the address field settings.
+    $enabledFields = array_filter($this->getFieldSetting('fields'));
+    $disabledFields = array_diff(AddressField::getAll(), $enabledFields);
+    foreach ($disabledFields as $field) {
+      $property = FieldHelper::getPropertyName($field);
+      $element[$property]['#access'] = FALSE;
+    }
     // Add predefined options to the created subdivision elements.
     $element = $this->processSubdivisionElements($element, $values);
 

@@ -7,7 +7,9 @@
 
 namespace Drupal\address\Plugin\Field\FieldType;
 
+use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Model\AddressInterface;
+use Drupal\address\LabelHelper;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -102,6 +104,32 @@ class AddressItem extends FieldItemBase implements AddressInterface {
       ->setLabel(t('The recipient.'));
 
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultFieldSettings() {
+    return [
+      'fields' => array_values(AddressField::getAll()),
+    ] + parent::defaultFieldSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+    $element['fields'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Used fields'),
+      '#description' => $this->t('Note: an address used for postal purposes needs all of the above fields.'),
+      '#default_value' => $this->getSetting('fields'),
+      '#options' => LabelHelper::getGenericFieldLabels(),
+      '#required' => TRUE,
+    ];
+
+    return $element;
   }
 
   /**
