@@ -70,27 +70,26 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
    * {@inheritdoc}
    */
   protected function loadDefinitions($countryCode, $parentId = null) {
-    // Treat the country code as the parent id on the top level.
-    $parentId = $parentId ?: $countryCode;
-    if (isset($this->definitions[$parentId])) {
-      return $this->definitions[$parentId];
+    $lookupId = $parentId ?: $countryCode;
+    if (isset($this->definitions[$lookupId])) {
+      return $this->definitions[$lookupId];
     }
 
-    $cacheKey = 'address.subdivisions.' . $parentId;
-    $filename = $this->definitionPath . $parentId . '.json';
-    if ($cached = $this->cache->get($cacheKey)) {
-      $this->definitions[$parentId] = $cached->data;
-    }
-    elseif ($rawDefinition = @file_get_contents($filename)) {
-      $this->definitions[$parentId] = json_decode($rawDefinition, true);
-      $this->cache->set($cacheKey, $this->definitions[$parentId], CacheBackendInterface::CACHE_PERMANENT, ['subdivisions']);
-    }
-    else {
-      // Not found. Bypass further loading attempts.
-      $this->definitions[$parentId] = [];
+    // If there are predefined subdivisions at this level, try to load them.
+    $this->definitions[$lookupId] = [];
+    if ($this->hasData($countryCode, $parentId)) {
+      $cacheKey = 'address.subdivisions.' . $lookupId;
+      $filename = $this->definitionPath . $lookupId . '.json';
+      if ($cached = $this->cache->get($cacheKey)) {
+        $this->definitions[$lookupId] = $cached->data;
+      }
+      elseif ($rawDefinition = @file_get_contents($filename)) {
+        $this->definitions[$lookupId] = json_decode($rawDefinition, true);
+        $this->cache->set($cacheKey, $this->definitions[$lookupId], CacheBackendInterface::CACHE_PERMANENT, ['subdivisions']);
+      }
     }
 
-    return $this->definitions[$parentId];
+    return $this->definitions[$lookupId];
   }
 
   /**
