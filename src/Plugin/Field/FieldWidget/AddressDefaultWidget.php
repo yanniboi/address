@@ -244,25 +244,27 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    */
   protected function processSubdivisionElements(array $element, array $values) {
     $depth = $this->subdivisionRepository->getDepth($values['country_code']);
-    if (!isset($element['administrative_area']) || $depth === 0) {
-      // No subdivision fields or no predefined data found.
+    if ($depth === 0) {
+      // No predefined data found.
       return $element;
     }
 
     // Add a parent id to each found subdivision element.
-    $element['administrative_area']['#parent_id'] = 0;
-    if (isset($element['locality']) && !empty($values['administrative_area'])) {
-      $element['locality']['#parent_id'] = $values['administrative_area'];
-    }
-    if (isset($element['dependent_locality']) && !empty($values['locality'])) {
-      $element['dependent_locality']['#parent_id'] = $values['locality'];
-    }
+    $subdivisionProperties = [
+      'administrative_area' => NULL,
+      'locality' => 'administrative_area',
+      'dependent_locality' => 'locality',
+    ];
     // Load and insert the subdivisions for each parent id.
-    foreach (['administrative_area', 'locality', 'dependent_locality'] as $index => $property) {
-      if (!isset($element[$property]['#parent_id'])) {
+    $currentDepth = 1;
+    foreach ($subdivisionProperties as $property => $parentProperty) {
+      if (!isset($element[$property]) || !Element::isVisibleElement($element[$property])) {
         break;
       }
-      $parentId = $element[$property]['#parent_id'];
+      if ($parentProperty && empty($values[$parentProperty])) {
+        break;
+      }
+      $parentId = $parentProperty ? $values[$parentProperty] : NULL;
       $subdivisions = $this->subdivisionRepository->getList($values['country_code'], $parentId);
       if (empty($subdivisions)) {
         break;
@@ -272,14 +274,14 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element[$property]['#options'] = $subdivisions;
       $element[$property]['#empty_value'] = '';
       unset($element[$property]['#size']);
-
-      $currentDepth = $index + 1;
       if ($currentDepth < $depth) {
         $element[$property]['#ajax'] = [
           'callback' => [get_class($this), 'ajaxRefresh'],
           'wrapper' => $element['#wrapper_id'],
         ];
       }
+
+      $currentDepth++;
     }
 
     return $element;
@@ -305,7 +307,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     }
     // Sort the moved elements, so that their #weight stays respected.
     foreach ($sort as $key) {
-      uasort($element[$key], array('Drupal\Component\Utility\SortArray', 'sortByWeightProperty'));
+      uasort($element[$key], ['Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
     }
 
     return $element;
