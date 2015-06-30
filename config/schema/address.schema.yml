@@ -46,3 +46,13 @@ field.field_settings.address:
       label: 'Used fields'
       sequence:
         - type: string
+
+field.widget.settings.address_default:
+  type: mapping
+  label: 'Default address formatter settings'
+  mapping:
+    available_countries:
+      type: sequence
+      label: 'Available countries'
+      sequence:
+        - type: string

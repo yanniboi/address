@@ -118,6 +118,33 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return [
+      'available_countries' => [],
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+    $element['available_countries'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Available countries'),
+      '#description' => $this->t('If no countries are selected, all countries will be available.'),
+      '#options' => $this->countryRepository->getList(),
+      '#default_value' => $this->getSetting('available_countries'),
+      '#multiple' => TRUE,
+      '#size' => 10,
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
     $fieldName = $this->fieldDefinition->getName();
     $idPrefix = implode('-', array_merge($element['#field_parents'], [$fieldName]));
@@ -129,6 +156,15 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $values = NestedArray::getValue($formState->getUserInput(), $parents, $hasInput);
     if (!$hasInput) {
       $values = $items[$delta]->toArray();
+    }
+    // Prepare the filtered country list.
+    $countryList = $this->countryRepository->getList();
+    $availableCountries = array_filter($this->getSetting('available_countries'));
+    if (empty($availableCountries)) {
+      $countries = $countryList;
+    }
+    else {
+      $countries = array_intersect_key($countryList, $availableCountries);
     }
 
     $element += [
@@ -151,7 +187,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $element['country_code'] = [
       '#type' => 'select',
       '#title' => $this->t('Country'),
-      '#options' => $this->countryRepository->getList(),
+      '#options' => $countries,
       '#default_value' => $values['country_code'],
       '#empty_value' => '',
       '#limit_validation_errors' => [],
