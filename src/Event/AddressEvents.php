@@ -21,4 +21,13 @@ final class AddressEvents {
    */
   const WIDGET_SETTINGS = 'address.widget.settings';
 
+  /**
+   * Name of the event fired when altering initial values.
+   *
+   * @Event
+   *
+   * @see \Drupal\address\Event\InitialValuesEvent
+   */
+  const INITIAL_VALUES = 'address.widget.initial_values';
+
 }

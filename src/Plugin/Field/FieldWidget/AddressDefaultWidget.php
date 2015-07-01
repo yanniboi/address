@@ -12,11 +12,13 @@ use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\address\Event\AddressEvents;
+use Drupal\address\Event\InitialValuesEvent;
 use Drupal\address\Event\WidgetSettingsEvent;
 use Drupal\address\FieldHelper;
 use Drupal\address\LabelHelper;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -68,6 +70,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   protected $eventDispatcher;
 
   /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * The altered settings.
    *
    * @var array
@@ -108,14 +117,17 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The subdivision repository.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository, EventDispatcherInterface $eventDispatcher) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository, EventDispatcherInterface $eventDispatcher, ConfigFactoryInterface $configFactory) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
 
     $this->addressFormatRepository = $addressFormatRepository;
     $this->countryRepository = $countryRepository;
     $this->subdivisionRepository = $subdivisionRepository;
     $this->eventDispatcher = $eventDispatcher;
+    $this->configFactory = $configFactory;
   }
 
   /**
@@ -132,7 +144,8 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $container->get('address.address_format_repository'),
       $container->get('address.country_repository'),
       $container->get('address.subdivision_repository'),
-      $container->get('event_dispatcher')
+      $container->get('event_dispatcher'),
+      $container->get('config.factory')
     );
   }
 
@@ -142,6 +155,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   public static function defaultSettings() {
     return [
       'available_countries' => [],
+      'default_country' => NULL,
     ] + parent::defaultSettings();
   }
 
@@ -149,16 +163,25 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $countryList = $this->countryRepository->getList();
+
     $element = [];
     $element['available_countries'] = [
       '#type' => 'select',
       '#title' => $this->t('Available countries'),
       '#description' => $this->t('If no countries are selected, all countries will be available.'),
-      '#options' => $this->countryRepository->getList(),
+      '#options' => $countryList,
       '#default_value' => $this->getSetting('available_countries'),
       '#multiple' => TRUE,
       '#size' => 10,
     ];
+    $element['default_country'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('Default country'),
+      '#options' => ['site_default' => $this->t('- Site default -')] + $countryList,
+      '#default_value' => $this->getSetting('default_country'),
+      '#empty_value' => '',
+    );
 
     return $element;
   }
@@ -195,6 +218,70 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   }
 
   /**
+   * Gets the initial values for the widget.
+   *
+   * This is a replacement for the disabled default values functionality.
+   *
+   * @see address_form_field_config_edit_form_alter()
+   *
+   * @return array
+   *   The initial values, keyed by property.
+   */
+  protected function getInitialValues() {
+    $availableCountries = $this->getAvailableCountries();
+    $defaultCountry = $this->getAlteredSetting('default_country');
+    // Resolve the special site_default option.
+    if ($defaultCountry == 'site_default') {
+      $defaultCountry = $this->configFactory->get('system.date')->get('country.default');
+    }
+    // Fallback to the first country in the list if the default country is not
+    // available, or is empty even though the field is required.
+    $notAvailable = $defaultCountry && !isset($availableCountries[$defaultCountry]);
+    $emptyButRequired = empty($defaultCountry) && $this->fieldDefinition->isRequired();
+    if ($notAvailable || $emptyButRequired) {
+      $defaultCountry = key($availableCountries);
+    }
+
+    $initialValues = [
+      'country_code' => $defaultCountry,
+      'administrative_area' => '',
+      'locality' => '',
+      'dependent_locality' => '',
+      'postal_code' => '',
+      'sorting_code' => '',
+      'address_line1' => '',
+      'address_line2' => '',
+      'organization' => '',
+      'recipient' => '',
+    ];
+    // Allow other modules to alter the values.
+    $event = new InitialValuesEvent($initialValues, $this->fieldDefinition);
+    $this->eventDispatcher->dispatch(AddressEvents::INITIAL_VALUES, $event);
+    $initialValues = $event->getInitialValues();
+
+    return $initialValues;
+  }
+
+  /**
+   * Gets the available countries.
+   *
+   * @return array
+   *   The available countries (countryCode => name).
+   */
+  protected function getAvailableCountries() {
+    $countryList = $this->countryRepository->getList();
+    $availableCountries = array_filter($this->getAlteredSetting('available_countries'));
+    if (empty($availableCountries)) {
+      $availableCountries = $countryList;
+    }
+    else {
+      $availableCountries = array_intersect_key($countryList, $availableCountries);
+    }
+
+    return $availableCountries;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
@@ -207,16 +294,8 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $parents = array_merge($element['#field_parents'], [$fieldName, $delta]);
     $values = NestedArray::getValue($formState->getUserInput(), $parents, $hasInput);
     if (!$hasInput) {
-      $values = $items[$delta]->toArray();
-    }
-    // Prepare the filtered country list.
-    $countryList = $this->countryRepository->getList();
-    $availableCountries = array_filter($this->getAlteredSetting('available_countries'));
-    if (empty($availableCountries)) {
-      $countries = $countryList;
-    }
-    else {
-      $countries = array_intersect_key($countryList, $availableCountries);
+      $item = $items[$delta];
+      $values = $item->isEmpty() ? $this->getInitialValues() : $item->toArray();
     }
 
     $element += [
@@ -239,7 +318,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $element['country_code'] = [
       '#type' => 'select',
       '#title' => $this->t('Country'),
-      '#options' => $countries,
+      '#options' => $this->getAvailableCountries(),
       '#default_value' => $values['country_code'],
       '#empty_value' => '',
       '#limit_validation_errors' => [],

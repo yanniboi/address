@@ -56,3 +56,6 @@ field.widget.settings.address_default:
       label: 'Available countries'
       sequence:
         - type: string
+    default_country:
+      type: string
+      label: 'Default country'
