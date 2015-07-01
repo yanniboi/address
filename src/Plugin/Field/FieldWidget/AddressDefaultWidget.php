@@ -11,6 +11,8 @@ use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
+use Drupal\address\Event\AddressEvents;
+use Drupal\address\Event\WidgetSettingsEvent;
 use Drupal\address\FieldHelper;
 use Drupal\address\LabelHelper;
 use Drupal\Component\Utility\Html;
@@ -22,6 +24,7 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Plugin implementation of the 'address' widget.
@@ -58,6 +61,20 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   protected $subdivisionRepository;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
+   * The altered settings.
+   *
+   * @var array
+   */
+  protected $alteredSettings = [];
+
+  /**
    * The size attributes for fields likely to be inlined.
    *
    * @var array
@@ -89,13 +106,16 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The country repository.
    * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
    *   The subdivision repository.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The event dispatcher.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository) {
+  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository, EventDispatcherInterface $eventDispatcher) {
     parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
 
     $this->addressFormatRepository = $addressFormatRepository;
     $this->countryRepository = $countryRepository;
     $this->subdivisionRepository = $subdivisionRepository;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -111,7 +131,8 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $configuration['third_party_settings'],
       $container->get('address.address_format_repository'),
       $container->get('address.country_repository'),
-      $container->get('address.subdivision_repository')
+      $container->get('address.subdivision_repository'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -143,6 +164,37 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   }
 
   /**
+   * Gets the altered settings.
+   *
+   * @return array
+   *   The altered settings.
+   */
+  protected function getAlteredSettings() {
+    if (!$this->alteredSettings) {
+      $event = new WidgetSettingsEvent($this->getSettings(), $this->fieldDefinition);
+      $this->eventDispatcher->dispatch(AddressEvents::WIDGET_SETTINGS, $event);
+      $this->alteredSettings = $event->getSettings();
+    }
+
+    return $this->alteredSettings;
+  }
+
+  /**
+   * Gets an altered setting.
+   *
+   * @param string $key
+   *   The setting name.
+   *
+   * @return mixed
+   *   The altered setting.
+   */
+  protected function getAlteredSetting($key) {
+    $alteredSettings = $this->getAlteredSettings();
+
+    return isset($this->alteredSettings[$key]) ? $this->alteredSettings[$key] : NULL;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
@@ -159,7 +211,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     }
     // Prepare the filtered country list.
     $countryList = $this->countryRepository->getList();
-    $availableCountries = array_filter($this->getSetting('available_countries'));
+    $availableCountries = array_filter($this->getAlteredSetting('available_countries'));
     if (empty($availableCountries)) {
       $countries = $countryList;
     }
