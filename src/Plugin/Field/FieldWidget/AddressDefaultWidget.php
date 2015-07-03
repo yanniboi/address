@@ -13,7 +13,6 @@ use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\address\Event\AddressEvents;
 use Drupal\address\Event\InitialValuesEvent;
-use Drupal\address\Event\WidgetSettingsEvent;
 use Drupal\address\FieldHelper;
 use Drupal\address\LabelHelper;
 use Drupal\Component\Utility\Html;
@@ -75,13 +74,6 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
-
-  /**
-   * The altered settings.
-   *
-   * @var array
-   */
-  protected $alteredSettings = [];
 
   /**
    * The size attributes for fields likely to be inlined.
@@ -154,7 +146,6 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    */
   public static function defaultSettings() {
     return [
-      'available_countries' => [],
       'default_country' => NULL,
     ] + parent::defaultSettings();
   }
@@ -166,15 +157,6 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $countryList = $this->countryRepository->getList();
 
     $element = [];
-    $element['available_countries'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Available countries'),
-      '#description' => $this->t('If no countries are selected, all countries will be available.'),
-      '#options' => $countryList,
-      '#default_value' => $this->getSetting('available_countries'),
-      '#multiple' => TRUE,
-      '#size' => 10,
-    ];
     $element['default_country'] = array(
       '#type' => 'select',
       '#title' => $this->t('Default country'),
@@ -187,59 +169,30 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   }
 
   /**
-   * Gets the altered settings.
-   *
-   * @return array
-   *   The altered settings.
-   */
-  protected function getAlteredSettings() {
-    if (!$this->alteredSettings) {
-      $event = new WidgetSettingsEvent($this->getSettings(), $this->fieldDefinition);
-      $this->eventDispatcher->dispatch(AddressEvents::WIDGET_SETTINGS, $event);
-      $this->alteredSettings = $event->getSettings();
-    }
-
-    return $this->alteredSettings;
-  }
-
-  /**
-   * Gets an altered setting.
-   *
-   * @param string $key
-   *   The setting name.
-   *
-   * @return mixed
-   *   The altered setting.
-   */
-  protected function getAlteredSetting($key) {
-    $alteredSettings = $this->getAlteredSettings();
-
-    return isset($this->alteredSettings[$key]) ? $this->alteredSettings[$key] : NULL;
-  }
-
-  /**
    * Gets the initial values for the widget.
    *
    * This is a replacement for the disabled default values functionality.
    *
    * @see address_form_field_config_edit_form_alter()
    *
+   * @param array $countryList
+   *   The filtered country list, in the country_code => name format.
+   *
    * @return array
    *   The initial values, keyed by property.
    */
-  protected function getInitialValues() {
-    $availableCountries = $this->getAvailableCountries();
-    $defaultCountry = $this->getAlteredSetting('default_country');
+  protected function getInitialValues(array $countryList) {
+    $defaultCountry = $this->getSetting('default_country');
     // Resolve the special site_default option.
     if ($defaultCountry == 'site_default') {
       $defaultCountry = $this->configFactory->get('system.date')->get('country.default');
     }
     // Fallback to the first country in the list if the default country is not
     // available, or is empty even though the field is required.
-    $notAvailable = $defaultCountry && !isset($availableCountries[$defaultCountry]);
+    $notAvailable = $defaultCountry && !isset($countryList[$defaultCountry]);
     $emptyButRequired = empty($defaultCountry) && $this->fieldDefinition->isRequired();
     if ($notAvailable || $emptyButRequired) {
-      $defaultCountry = key($availableCountries);
+      $defaultCountry = key($countryList);
     }
 
     $initialValues = [
@@ -263,39 +216,25 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   }
 
   /**
-   * Gets the available countries.
-   *
-   * @return array
-   *   The available countries (countryCode => name).
-   */
-  protected function getAvailableCountries() {
-    $countryList = $this->countryRepository->getList();
-    $availableCountries = array_filter($this->getAlteredSetting('available_countries'));
-    if (empty($availableCountries)) {
-      $availableCountries = $countryList;
-    }
-    else {
-      $availableCountries = array_intersect_key($countryList, $availableCountries);
-    }
-
-    return $availableCountries;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
     $fieldName = $this->fieldDefinition->getName();
     $idPrefix = implode('-', array_merge($element['#field_parents'], [$fieldName]));
     $wrapperId = Html::getUniqueId($idPrefix . '-ajax-wrapper');
+    $item = $items[$delta];
+    $availableCountries = $item->getAvailableCountries();
+    $countryList = $this->countryRepository->getList($locale);
+    if (!empty($availableCountries)) {
+      $countryList = array_intersect_key($countryList, $availableCountries);
+    }
     // If the form has been rebuilt via AJAX, use the values from user input.
     // $formState->getValues() can't be used here because it's empty due to
     // #limit_validaiton_errors.
     $parents = array_merge($element['#field_parents'], [$fieldName, $delta]);
     $values = NestedArray::getValue($formState->getUserInput(), $parents, $hasInput);
     if (!$hasInput) {
-      $item = $items[$delta];
-      $values = $item->isEmpty() ? $this->getInitialValues() : $item->toArray();
+      $values = $item->isEmpty() ? $this->getInitialValues($countryList) : $item->toArray();
     }
 
     $element += [
@@ -318,7 +257,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $element['country_code'] = [
       '#type' => 'select',
       '#title' => $this->t('Country'),
-      '#options' => $this->getAvailableCountries(),
+      '#options' => $countryList,
       '#default_value' => $values['country_code'],
       '#empty_value' => '',
       '#limit_validation_errors' => [],

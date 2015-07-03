@@ -13,13 +13,13 @@ namespace Drupal\address\Event;
 final class AddressEvents {
 
   /**
-   * Name of the event fired when altering widget settings.
+   * Name of the event fired when altering the list of available countries.
    *
    * @Event
    *
-   * @see \Drupal\address\Event\WidgetSettingsEvent
+   * @see \Drupal\address\Event\AvailableCountriesEvent
    */
-  const WIDGET_SETTINGS = 'address.widget.settings';
+  const AVAILABLE_COUNTRIES = 'address.available_countries';
 
   /**
    * Name of the event fired when altering initial values.

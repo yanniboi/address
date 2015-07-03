@@ -9,6 +9,8 @@ namespace Drupal\address\Plugin\Field\FieldType;
 
 use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Model\AddressInterface;
+use Drupal\address\Event\AddressEvents;
+use Drupal\address\Event\AvailableCountriesEvent;
 use Drupal\address\LabelHelper;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -28,6 +30,13 @@ use Drupal\Core\TypedData\DataDefinition;
  * )
  */
 class AddressItem extends FieldItemBase implements AddressInterface {
+
+  /**
+   * An altered list of available countries.
+   *
+   * @var array
+   */
+  protected static $availableCountries = [];
 
   /**
    * {@inheritdoc}
@@ -113,6 +122,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public static function defaultFieldSettings() {
     return [
+      'available_countries' => [],
       'fields' => array_values(AddressField::getAll()),
     ] + parent::defaultFieldSettings();
   }
@@ -122,6 +132,15 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $element = [];
+    $element['available_countries'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Available countries'),
+      '#description' => $this->t('If no countries are selected, all countries will be available.'),
+      '#options' => \Drupal::service('address.country_repository')->getList(),
+      '#default_value' => $this->getSetting('available_countries'),
+      '#multiple' => TRUE,
+      '#size' => 10,
+    ];
     $element['fields'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Used fields'),
@@ -132,6 +151,27 @@ class AddressItem extends FieldItemBase implements AddressInterface {
     ];
 
     return $element;
+  }
+
+  /**
+   * Gets the available countries for the current field.
+   *
+   * @return array
+   *   A list of country codes.
+   */
+  public function getAvailableCountries() {
+    // Alter the list once per field, instead of once per field delta.
+    $fieldDefinition = $this->getFieldDefinition();
+    $definitionId = spl_object_hash($fieldDefinition);
+    if (!isset(static::$availableCountries[$definitionId])) {
+      $availableCountries = array_filter($this->getSetting('available_countries'));
+      $eventDispatcher = \Drupal::service('event_dispatcher');
+      $event = new AvailableCountriesEvent($availableCountries, $fieldDefinition);
+      $eventDispatcher->dispatch(AddressEvents::AVAILABLE_COUNTRIES, $event);
+      static::$availableCountries[$definitionId] = $event->getAvailableCountries();
+    }
+
+    return static::$availableCountries[$definitionId];
   }
 
   /**
