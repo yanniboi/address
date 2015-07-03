@@ -223,8 +223,9 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $idPrefix = implode('-', array_merge($element['#field_parents'], [$fieldName]));
     $wrapperId = Html::getUniqueId($idPrefix . '-ajax-wrapper');
     $item = $items[$delta];
+    $fullCountryList = $this->countryRepository->getList($locale);
+    $countryList = $fullCountryList;
     $availableCountries = $item->getAvailableCountries();
-    $countryList = $this->countryRepository->getList($locale);
     if (!empty($availableCountries)) {
       $countryList = array_intersect_key($countryList, $availableCountries);
     }
@@ -235,6 +236,17 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $values = NestedArray::getValue($formState->getUserInput(), $parents, $hasInput);
     if (!$hasInput) {
       $values = $item->isEmpty() ? $this->getInitialValues($countryList) : $item->toArray();
+    }
+
+    $countryCode = $values['country_code'];
+    if (!empty($countryCode) && !isset($countryList[$countryCode])) {
+      // This item's country is no longer available. Add it back to the top
+      // of the list to ensure all data is displayed properly. The validator
+      // can then prevent the save and tell the user to change the country.
+      $missingElement = [
+        $countryCode => $fullCountryList[$countryCode],
+      ];
+      $countryList = $missingElement + $countryList;
     }
 
     $element += [
@@ -258,7 +270,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       '#type' => 'select',
       '#title' => $this->t('Country'),
       '#options' => $countryList,
-      '#default_value' => $values['country_code'],
+      '#default_value' => $countryCode,
       '#empty_value' => '',
       '#limit_validation_errors' => [],
       '#element_validate' => [
@@ -274,7 +286,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       ],
       '#weight' => -100,
     ];
-    if (!empty($values['country_code'])) {
+    if (!empty($countryCode)) {
       $element = $this->addressElements($element, $values);
     }
 
