@@ -8,6 +8,7 @@
 namespace Drupal\address\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use CommerceGuys\Addressing\Model\AddressInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -47,20 +48,20 @@ class CountryConstraintValidator extends ConstraintValidator implements Containe
    * {@inheritdoc}
    */
   public function validate($value, Constraint $constraint) {
-    if ($value === NULL || $value === '') {
+    if (!($value instanceof AddressInterface)) {
+      throw new UnexpectedTypeException($value, 'AddressInterface');
+    }
+
+    $address = $value;
+    $countryCode = $address->getCountryCode();
+    if ($countryCode === NULL || $countryCode === '') {
       return;
     }
 
-    if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
-      throw new UnexpectedTypeException($value, 'string');
-    }
-
     $countries = $this->countryRepository->getList();
-    $value = (string) $value;
-
-    if (!isset($countries[$value])) {
+    if (!isset($countries[$countryCode])) {
       $this->context->buildViolation($constraint->message)
-        ->setParameter('%value', $this->formatValue($value))
+        ->setParameter('%value', $this->formatValue($countryCode))
         ->addViolation();
     }
   }

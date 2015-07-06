@@ -93,8 +93,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
     $properties['country_code'] = DataDefinition::create('string')
-      ->setLabel(t('The two-letter country code.'))
-      ->addConstraint('Country');
+      ->setLabel(t('The two-letter country code.'));
     $properties['administrative_area'] = DataDefinition::create('string')
       ->setLabel(t('The top-level administrative subdivision of the country.'));
     $properties['locality'] = DataDefinition::create('string')
@@ -181,6 +180,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
     $constraints = parent::getConstraints();
     $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
     $enabledFields = array_filter($this->getSetting('fields'));
+    $constraints[] = $manager->create('Country');
     $constraints[] = $manager->create('AddressFormat', ['fields' => $enabledFields]);
 
     return $constraints;

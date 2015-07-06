@@ -14,7 +14,8 @@ use Symfony\Component\Validator\Constraint;
  *
  * @Constraint(
  *   id = "Country",
- *   label = @Translation("Country", context = "Validation")
+ *   label = @Translation("Country", context = "Validation"),
+ *   type = { "address" }
  * )
  */
 class CountryConstraint extends Constraint {
