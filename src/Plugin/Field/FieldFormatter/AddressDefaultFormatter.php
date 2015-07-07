@@ -8,10 +8,10 @@
 namespace Drupal\address\Plugin\Field\FieldFormatter;
 
 use CommerceGuys\Addressing\Enum\AddressField;
-use CommerceGuys\Addressing\Model\AddressInterface;
 use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
+use Drupal\address\AddressInterface;
 use Drupal\address\FieldHelper;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -127,7 +127,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
   /**
    * Builds a renderable array for a single address item.
    *
-   * @param \CommerceGuys\Addressing\Model\AddressInterface $address
+   * @param \Drupal\address\AddressInterface $address
    *   The address.
    *
    * @return array
@@ -240,7 +240,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
   /**
    * Gets the address values used for rendering.
    *
-   * @param \CommerceGuys\Addressing\Model\AddressInterface $address
+   * @param \Drupal\address\AddressInterface $address
    *   The address.
    *
    * @return array

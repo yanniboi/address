@@ -8,9 +8,9 @@
 namespace Drupal\address\Plugin\Field\FieldType;
 
 use CommerceGuys\Addressing\Enum\AddressField;
-use CommerceGuys\Addressing\Model\AddressInterface;
 use Drupal\address\Event\AddressEvents;
 use Drupal\address\Event\AvailableCountriesEvent;
+use Drupal\address\AddressInterface;
 use Drupal\address\LabelHelper;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
