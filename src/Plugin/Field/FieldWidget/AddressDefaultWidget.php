@@ -223,7 +223,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $idPrefix = implode('-', array_merge($element['#field_parents'], [$fieldName]));
     $wrapperId = Html::getUniqueId($idPrefix . '-ajax-wrapper');
     $item = $items[$delta];
-    $fullCountryList = $this->countryRepository->getList($locale);
+    $fullCountryList = $this->countryRepository->getList();
     $countryList = $fullCountryList;
     $availableCountries = $item->getAvailableCountries();
     if (!empty($availableCountries)) {
