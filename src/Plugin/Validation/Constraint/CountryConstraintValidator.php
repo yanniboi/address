@@ -61,6 +61,7 @@ class CountryConstraintValidator extends ConstraintValidator implements Containe
     $countries = $this->countryRepository->getList();
     if (!isset($countries[$countryCode])) {
       $this->context->buildViolation($constraint->message)
+        ->atPath('country_code')
         ->setParameter('%value', $this->formatValue($countryCode))
         ->addViolation();
     }

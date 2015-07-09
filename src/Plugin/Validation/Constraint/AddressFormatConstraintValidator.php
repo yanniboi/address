@@ -7,9 +7,10 @@
 
 namespace Drupal\address\Plugin\Validation\Constraint;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Validator\Constraints\AddressFormatValidator as ExternalValidator;
+use Drupal\address\FieldHelper;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -28,6 +29,16 @@ class AddressFormatConstraintValidator extends ExternalValidator implements Cont
       $container->get('address.address_format_repository'),
       $container->get('address.subdivision_repository')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function addViolation($field, $message, $invalidValue) {
+    $this->context->buildViolation($message)
+      ->atPath(FieldHelper::getPropertyName($field))
+      ->setInvalidValue($invalidValue)
+      ->addViolation();
   }
 
 }
