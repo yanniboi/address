@@ -179,8 +179,9 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   public function getConstraints() {
     $constraints = parent::getConstraints();
     $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
+    $availableCountries = $this->getAvailableCountries();
     $enabledFields = array_filter($this->getSetting('fields'));
-    $constraints[] = $manager->create('Country');
+    $constraints[] = $manager->create('Country', ['availableCountries' => $availableCountries]);
     $constraints[] = $manager->create('AddressFormat', ['fields' => $enabledFields]);
 
     return $constraints;

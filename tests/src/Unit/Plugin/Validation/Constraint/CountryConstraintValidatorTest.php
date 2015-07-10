@@ -28,7 +28,7 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
    * {@inheritdoc}
    */
   public function setUp() {
-    $this->constraint = new CountryConstraint();
+    $this->constraint = new CountryConstraint(['availableCountries' => ['FR']]);
 
     // The following code is copied from the parent setUp(), which isn't
     // called to avoid the call to \Locale, which introduces a dependency
@@ -87,11 +87,19 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
   /**
    * @covers ::validate
    */
-  public function testValidCountries() {
-    $this->validator->validate($this->getMockAddress('FR'), $this->constraint);
-    $this->assertNoViolation();
-
+  public function testNotAvailableCountry() {
     $this->validator->validate($this->getMockAddress('RS'), $this->constraint);
+    $this->buildViolation($this->constraint->notAvailableMessage)
+      ->setParameters(['%value' => '"RS"'])
+      ->atPath('country_code')
+      ->assertRaised();
+  }
+
+  /**
+   * @covers ::validate
+   */
+  public function testValidCountry() {
+    $this->validator->validate($this->getMockAddress('FR'), $this->constraint);
     $this->assertNoViolation();
   }
 

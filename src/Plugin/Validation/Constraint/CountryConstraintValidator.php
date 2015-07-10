@@ -8,7 +8,7 @@
 namespace Drupal\address\Plugin\Validation\Constraint;
 
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
-use Drupal\address\AddressInteface;
+use Drupal\address\AddressInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -60,10 +60,19 @@ class CountryConstraintValidator extends ConstraintValidator implements Containe
 
     $countries = $this->countryRepository->getList();
     if (!isset($countries[$countryCode])) {
-      $this->context->buildViolation($constraint->message)
+      $this->context->buildViolation($constraint->invalidMessage)
         ->atPath('country_code')
         ->setParameter('%value', $this->formatValue($countryCode))
         ->addViolation();
+      return;
+    }
+
+    $availableCountries = $constraint->availableCountries;
+     if (!empty($availableCountries) && !in_array($countryCode, $availableCountries)) {
+       $this->context->buildViolation($constraint->notAvailableMessage)
+          ->atPath('country_code')
+          ->setParameter('%value', $this->formatValue($countryCode))
+          ->addViolation();
     }
   }
 
