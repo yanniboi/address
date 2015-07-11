@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTes
 
 /**
  * @coversDefaultClass \Drupal\address\Plugin\Validation\Constraint\CountryConstraintValidator
+ * @group address
  */
 class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
 
