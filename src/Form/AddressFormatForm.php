@@ -95,7 +95,7 @@ class AddressFormatForm extends EntityForm {
     $form['uppercaseFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Uppercase fields'),
-      '#description' => t('Uppercased on envelopes to faciliate automatic post handling.'),
+      '#description' => t('Uppercased on envelopes to facilitate automatic post handling.'),
       '#options' => LabelHelper::getGenericFieldLabels(),
       '#default_value' => $addressFormat->getUppercaseFields(),
     ];
