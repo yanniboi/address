@@ -62,7 +62,7 @@ class AddressFormatTest extends WebTestBase {
   /**
    * Tests creating a address format programmatically.
    */
-  function testAddressFormatCreationProgramatically() {
+  function testAddressFormatCreationProgrammatically() {
     // Create a address format type programmatically.
     $addressFormat = $this->createRandomAddressFormat();
     $addressFormatExists = (bool) entity_load('address_format', $addressFormat->id());
@@ -76,10 +76,15 @@ class AddressFormatTest extends WebTestBase {
     $this->assertResponse(200, 'The new address format can be accessed at admin/config/regional/address-formats.');
   }
 
+  /**
+   * Test importing address formats using service.
+   */
   function testAddressFormatImport() {
     $count = \Drupal::entityQuery('address_format')->count()->execute();
     $this->assertEqual(0, $count, 'No address formats exists before import');
 
+    // We can't use the batch job when running this in web interface so do the
+    // import by calling importEntities manually.
     $importer = \Drupal::service('address.address_format_importer');
     $importer->importEntities(array_keys(CountryManager::getStandardList()));
     $new_count = \Drupal::entityQuery('address_format')->count()->execute();
@@ -87,4 +92,5 @@ class AddressFormatTest extends WebTestBase {
     // the repository and we don't want our test to fail if that change.
     $this->assertTrue($new_count > $count, $new_count . ' address formats created out of ' . count(CountryManager::getStandardList()));
   }
+
 }
