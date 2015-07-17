@@ -74,7 +74,11 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
       'operations' => $operations,
     ]);
     // Drush requires the batch to be started manually.
-    if (PHP_SAPI === 'cli' && function_exists("drush_backend_batch_process")) {
+    // When the site is being installed, drush_backend_batch_process wail make
+    // the installation stall when done with drush, so use batch_process
+    // instead
+    // @TODO Reviset this when Drupal core and drush is more stable.
+    if (PHP_SAPI === 'cli' && function_exists("drush_backend_batch_process") && empty($GLOBALS['install_state'])) {
       drush_backend_batch_process();
     }
     // Or if the code is running with the CLI (such as simpletest), run
