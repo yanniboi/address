@@ -75,4 +75,16 @@ class AddressFormatTest extends WebTestBase {
     $this->drupalGet('admin/config/regional/address-formats/manage/' . $addressFormat->id());
     $this->assertResponse(200, 'The new address format can be accessed at admin/config/regional/address-formats.');
   }
+
+  function testAddressFormatImport() {
+    $count = \Drupal::entityQuery('address_format')->count()->execute();
+    $this->assertEqual(0, $count, 'No address formats exists before import');
+
+    $importer = \Drupal::service('address.address_format_importer');
+    $importer->importEntities(array_keys(CountryManager::getStandardList()));
+    $new_count = \Drupal::entityQuery('address_format')->count()->execute();
+    // We don't know how many address formats was created, since it depends on
+    // the repository and we don't want our test to fail if that change.
+    $this->assertTrue($new_count > $count, $new_count . ' address formats created out of ' . count(CountryManager::getStandardList()));
+  }
 }
