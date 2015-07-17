@@ -35,8 +35,8 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
     // called to avoid the call to \Locale, which introduces a dependency
     // on the intl extension (or symfony/intl).
     $this->group = 'MyGroup';
-    $this->metadata = null;
-    $this->object = null;
+    $this->metadata = NULL;
+    $this->object = NULL;
     $this->value = 'InvalidValue';
     $this->root = 'root';
     $this->propertyPath = '';

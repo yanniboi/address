@@ -28,7 +28,7 @@ class AddressFormatConstraint extends Constraint {
   /**
    * {@inheritDoc}
    */
-  public function __construct($options = null) {
+  public function __construct($options = NULL) {
     parent::__construct($options);
 
     // Validate all fields by default.

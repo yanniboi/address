@@ -49,7 +49,7 @@ class AddressFormatRepository implements AddressFormatRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function get($countryCode, $locale = null) {
+  public function get($countryCode, $locale = NULL) {
     if ($locale) {
       $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $locale]));
@@ -71,7 +71,7 @@ class AddressFormatRepository implements AddressFormatRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAll($locale = null) {
+  public function getAll($locale = NULL) {
     if ($locale) {
       $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $locale]));

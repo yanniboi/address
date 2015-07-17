@@ -63,7 +63,7 @@ class CountryRepository extends ExternalCountryRepository implements AddressingC
     }
     else {
       $filename = $this->definitionPath . $locale . '.json';
-      $this->definitions[$locale] = json_decode(file_get_contents($filename), true);
+      $this->definitions[$locale] = json_decode(file_get_contents($filename), TRUE);
       // Merge-in base definitions.
       $baseDefinitions = $this->loadBaseDefinitions();
       foreach ($this->definitions[$locale] as $countryCode => $definition) {
@@ -90,7 +90,7 @@ class CountryRepository extends ExternalCountryRepository implements AddressingC
       $this->baseDefinitions = $cached->data;
     }
     else {
-      $this->baseDefinitions = json_decode(file_get_contents($this->definitionPath . 'base.json'), true);
+      $this->baseDefinitions = json_decode(file_get_contents($this->definitionPath . 'base.json'), TRUE);
       $this->cache->set($cacheKey, $this->baseDefinitions, CacheBackendInterface::CACHE_PERMANENT, ['countries']);
     }
 

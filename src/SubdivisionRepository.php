@@ -58,7 +58,7 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
       }
       else {
         $filename = $this->definitionPath . 'depths.json';
-        $this->depths = json_decode(file_get_contents($filename), true);
+        $this->depths = json_decode(file_get_contents($filename), TRUE);
         $this->cache->set($cacheKey, $this->depths, CacheBackendInterface::CACHE_PERMANENT, ['subdivisions']);
       }
     }
@@ -69,7 +69,7 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
   /**
    * {@inheritdoc}
    */
-  protected function loadDefinitions($countryCode, $parentId = null) {
+  protected function loadDefinitions($countryCode, $parentId = NULL) {
     $lookupId = $parentId ?: $countryCode;
     if (isset($this->definitions[$lookupId])) {
       return $this->definitions[$lookupId];
@@ -84,7 +84,7 @@ class SubdivisionRepository extends ExternalSubdivisionRepository {
         $this->definitions[$lookupId] = $cached->data;
       }
       elseif ($rawDefinition = @file_get_contents($filename)) {
-        $this->definitions[$lookupId] = json_decode($rawDefinition, true);
+        $this->definitions[$lookupId] = json_decode($rawDefinition, TRUE);
         $this->cache->set($cacheKey, $this->definitions[$lookupId], CacheBackendInterface::CACHE_PERMANENT, ['subdivisions']);
       }
     }
