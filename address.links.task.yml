@@ -1,4 +1,0 @@
-entity.address_format.collection:
-  route_name: 'entity.address_format.collection'
-  base_route: 'entity.address_format.collection'
-  title: 'List'
