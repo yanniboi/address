@@ -60,6 +60,9 @@ class AvailableCountriesEvent extends Event {
   /**
    * Sets the available countries.
    *
+   * @param array $availableCountries
+   *   The available countries to set.
+   *
    * @return $this
    */
   public function setAvailableCountries(array $availableCountries) {

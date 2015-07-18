@@ -77,7 +77,7 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
     // When the site is being installed, drush_backend_batch_process wail make
     // the installation stall when done with drush, so use batch_process
     // instead
-    // @TODO Reviset this when Drupal core and drush is more stable.
+    // @TODO Revisit this when Drupal core and drush is more stable.
     if (PHP_SAPI === 'cli' && function_exists("drush_backend_batch_process") && empty($GLOBALS['install_state'])) {
       drush_backend_batch_process();
     }
@@ -172,7 +172,8 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
    * Gets the available library translations.
    *
    * @return array
-   *   An array in the $languageCode => $countryCodes format.
+   *   Array keyed by language code who's value is an array of country codes
+   *   related to that language.
    */
   protected function getAvailableTranslations() {
     // Hardcoded for now, since the library has no method for getting this data.

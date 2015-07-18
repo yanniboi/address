@@ -37,7 +37,7 @@ class CountryRepository extends ExternalCountryRepository implements AddressingC
   /**
    * Creates a CountryRepository instance.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.

@@ -18,9 +18,14 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
   /**
    * The number of entities to list per page.
    *
+   * Drupal has 258 different languages, along with the generic language we
+   * should be able to display all languages with a limit of 260. We could
+   * calculate this, but that would be a bit of a waste since this probably wont
+   * change.
+   *
    * @var int
    */
-  protected $limit = 210;
+  protected $limit = 260;
 
   /**
    * {@inheritdoc}

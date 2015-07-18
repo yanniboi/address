@@ -58,6 +58,9 @@ class InitialValuesEvent extends Event {
   /**
    * Sets the initial values.
    *
+   * @param array $initialValues
+   *   The inital values to set.
+   *
    * @return $this
    */
   public function setInitialValues(array $initialValues) {

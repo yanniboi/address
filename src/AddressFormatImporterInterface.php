@@ -23,7 +23,7 @@ interface AddressFormatImporterInterface {
    * Imports address formats with the given country codes.
    *
    * @param array $countryCodes
-   *   The country codes used to identify address formats.
+   *   Array of country codes to import address formats for.
    */
   public function importEntities(array $countryCodes);
 
@@ -31,7 +31,7 @@ interface AddressFormatImporterInterface {
    * Imports translations for the given language codes.
    *
    * @param array $langcodes
-   *   Language codes used for the translations.
+   *   Array of language codes to import translations for.
    */
   public function importTranslations(array $langcodes);
 
