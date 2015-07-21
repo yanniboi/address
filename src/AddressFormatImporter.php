@@ -73,18 +73,8 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
       'init_message' => t('Preparing to import...'),
       'operations' => $operations,
     ]);
-    // Drush requires the batch to be started manually.
-    // When the site is being installed, drush_backend_batch_process wail make
-    // the installation stall when done with drush, so use batch_process
-    // instead
-    // @TODO Revisit this when Drupal core and drush is more stable.
-    if (PHP_SAPI === 'cli' && function_exists("drush_backend_batch_process") && empty($GLOBALS['install_state'])) {
-      drush_backend_batch_process();
-    }
-    // Or if the code is running with the CLI (such as simpletest), run
-    // batch_process with progressive false to ensure address formats are
-    // imported correctly
-    elseif (PHP_SAPI === 'cli') {
+    // Drush and Simpletest require the batch to be processed manually.
+    if (PHP_SAPI === 'cli' || drupal_valid_test_ua()) {
       $batch =& batch_get();
       $batch['progressive'] = FALSE;
       batch_process();
