@@ -16,12 +16,10 @@ use Drupal\Core\Entity\EntityInterface;
 class AddressFormatListBuilder extends ConfigEntityListBuilder {
 
   /**
-   * The number of entities to list per page.
+   * The number of address formats to list per page.
    *
-   * Drupal has 258 different languages, along with the generic language we
-   * should be able to display all languages with a limit of 260. We could
-   * calculate this, but that would be a bit of a waste since this probably wont
-   * change.
+   * The CLDR country list contains 253 countries, this limit ensures there's
+   * no pagination even if an address format is created for each one.
    *
    * @var int
    */
