@@ -43,7 +43,7 @@ class AddressFormatTest extends WebTestBase {
 
     // Find a random country code that doesn't exist yet.
     while ($key = array_rand($countryCodes)) {
-      if (entity_load('address_format', $countryCodes[$key])) {
+      if (AddressFormat::load($countryCodes[$key])) {
         continue;
       }
       $countryCode = $countryCodes[$key];
@@ -66,7 +66,7 @@ class AddressFormatTest extends WebTestBase {
   function testAddressFormatCreationProgrammatically() {
     // Create a address format type programmatically.
     $addressFormat = $this->createRandomAddressFormat();
-    $addressFormatExists = (bool) entity_load('address_format', $addressFormat->id());
+    $addressFormatExists = (bool) AddressFormat::load($addressFormat->id());
     $this->assertTrue($addressFormatExists, 'The new address format has been created in the database.');
 
     // Login a test user.
