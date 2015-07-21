@@ -81,19 +81,10 @@ class AddressFormatTest extends WebTestBase {
    * Test importing address formats using service.
    */
   function testAddressFormatImport() {
-    $count = \Drupal::entityQuery('address_format')->count()->execute();
-    $this->assertEqual(0, $count, 'No address formats exists before import');
-
-    // We can't use the batch job when running this in web interface so do the
-    // import by calling importEntities manually.
     $externalRepository = new AddressFormatRepository();
-    $addressFormats = $externalRepository->getAll();
-    $importer = \Drupal::service('address.address_format_importer');
-    $importer->importEntities(array_keys($addressFormats));
-
+    $externalCount = count($externalRepository->getAll());
     $count = \Drupal::entityQuery('address_format')->count()->execute();
-    $externalCount = count($addressFormats);
-    $this->assertTrue(($count == $externalCount), $count . ' address formats created.');
+    $this->assertEqual($externalCount, $count, 'All address formats imported at installation.');
   }
 
 }
