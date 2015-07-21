@@ -7,10 +7,10 @@
 
 namespace Drupal\address\Tests;
 
+use CommerceGuys\Addressing\Repository\AddressFormatRepository;
 use Drupal\address\Entity\AddressFormat;
 use Drupal\Core\Locale\CountryManager;
 use Drupal\simpletest\WebTestBase;
-
 
 /**
  * Ensures that address format functions work correctly.
@@ -18,6 +18,7 @@ use Drupal\simpletest\WebTestBase;
  * @group address
  */
 class AddressFormatTest extends WebTestBase {
+
   /**
    * Modules to enable.
    *
@@ -26,7 +27,7 @@ class AddressFormatTest extends WebTestBase {
   public static $modules = ['system', 'user', 'address'];
 
   /**
-   *
+   * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
@@ -85,12 +86,14 @@ class AddressFormatTest extends WebTestBase {
 
     // We can't use the batch job when running this in web interface so do the
     // import by calling importEntities manually.
+    $externalRepository = new AddressFormatRepository();
+    $addressFormats = $externalRepository->getAll();
     $importer = \Drupal::service('address.address_format_importer');
-    $importer->importEntities(array_keys(CountryManager::getStandardList()));
-    $new_count = \Drupal::entityQuery('address_format')->count()->execute();
-    // We don't know how many address formats was created, since it depends on
-    // the repository and we don't want our test to fail if that change.
-    $this->assertTrue($new_count > $count, $new_count . ' address formats created out of ' . count(CountryManager::getStandardList()));
+    $importer->importEntities(array_keys($addressFormats));
+
+    $count = \Drupal::entityQuery('address_format')->count()->execute();
+    $externalCount = count($addressFormats);
+    $this->assertTrue(($count == $externalCount), $count . ' address formats created.');
   }
 
 }

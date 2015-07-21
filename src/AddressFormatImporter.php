@@ -127,11 +127,6 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
   public function importEntities(array $countryCodes) {
     foreach ($countryCodes as $countryCode) {
       $addressFormat = $this->externalRepository->get($countryCode);
-      // Don't import the generic country code.
-      if ($addressFormat->getCountryCode() == 'ZZ') {
-        continue;
-      }
-
       $values = [
         'langcode' => 'en',
         'countryCode' => $addressFormat->getCountryCode(),
