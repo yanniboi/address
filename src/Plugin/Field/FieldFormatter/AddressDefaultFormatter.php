@@ -13,6 +13,7 @@ use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\address\AddressInterface;
 use Drupal\address\FieldHelper;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -113,7 +114,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
     foreach ($items as $delta => $item) {
       $elements[$delta] = [
         '#prefix' => '<p translate="no">',
-        '#sufix' => '</p>',
+        '#suffix' => '</p>',
         '#post_render' => [
           [get_class($this), 'postRender'],
         ],
@@ -152,7 +153,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
       '#type' => 'html_tag',
       '#tag' => 'span',
       '#attributes' => ['class' => ['country']],
-      '#value' => $countries[$countryCode],
+      '#value' => SafeMarkup::checkPlain($countries[$countryCode]),
       '#placeholder' => '%country',
     ];
     foreach ($addressFormat->getUsedFields() as $field) {
@@ -163,7 +164,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
         '#type' => 'html_tag',
         '#tag' => 'span',
         '#attributes' => ['class' => [$class]],
-        '#value' => $values[$field],
+        '#value' => SafeMarkup::checkPlain($values[$field]),
         '#placeholder' => '%' . $field,
       ];
     }
