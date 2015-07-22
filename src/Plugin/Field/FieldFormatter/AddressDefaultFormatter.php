@@ -137,6 +137,9 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
     $values = $this->getValues($address);
     $countryCode = $address->getCountryCode();
     $addressFormat = $this->addressFormatRepository->get($countryCode, $address->getLocale());
+    if (!$addressFormat) {
+      var_dump($countryCode);
+    }
     $countries = $this->countryRepository->getList();
 
     $element = [];
