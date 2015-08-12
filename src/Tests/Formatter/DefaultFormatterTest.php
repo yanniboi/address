@@ -14,6 +14,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\simpletest\KernelTestBase;
 
 /**
@@ -26,7 +27,7 @@ class DefaultFormatterTest extends KernelTestBase {
   /**
    * @var array
    */
-  public static $modules = ['system', 'field', 'text', 'entity_test', 'user', 'address'];
+  public static $modules = ['system', 'field', 'language', 'text', 'entity_test', 'user', 'address'];
 
   /**
    * @var string
@@ -60,11 +61,14 @@ class DefaultFormatterTest extends KernelTestBase {
     $this->installConfig(['address']);
     $this->installEntitySchema('entity_test');
 
+    ConfigurableLanguage::createFromLangcode('zh-hant')->save();
+
     // The address module is never installed, so the importer doesn't run
     // automatically. Instead, we manually import the address formats we need.
-    $countryCodes = ['SV', 'ZZ'];
+    $countryCodes = ['SV', 'TW', 'US', 'ZZ'];
     $importer = \Drupal::service('address.address_format_importer');
     $importer->importEntities($countryCodes);
+    $importer->importTranslations(['zh-hant']);
 
     $this->entityType = 'entity_test';
     $this->bundle = $this->entityType;
@@ -125,6 +129,74 @@ class DefaultFormatterTest extends KernelTestBase {
       '!line6' => '</p>',
     ]);
     $this->assertRaw($expected, 'The SV address has been properly formatted.');
+  }
+
+  /**
+   * Tests Taiwan address formatting.
+   */
+  public function testTaiwanAddress() {
+    $language = \Drupal::languageManager()->getLanguage('zh-hant');
+    \Drupal::languageManager()->setConfigOverrideLanguage($language);
+
+    $entity = EntityTest::create([]);
+    $translation = $entity->addTranslation('zh-hant', []);
+    $translation->{$this->fieldName} = [
+      'country_code' => 'TW',
+      'administrative_area' => 'TW-TPE',
+      'locality' => 'TW-TPE-e3cc33',
+      'address_line1' => 'Sec. 3 Hsin-yi Rd.',
+      'postal_code' => '106',
+      // Any HTML in the fields is supposed to be escaped.
+      'organization' => 'Giant <h2>Bike</h2> Store',
+      'recipient' => 'Mr. Liu',
+    ];
+    $a = $this->renderEntityFields($translation, $this->display);
+    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5!line6!line7!line8', [
+      '!line1' => '<p translate="no">',
+      '!line2' => '<span class="country">台灣</span><br>' . "\n",
+      '!line3' => '<span class="postal-code">106</span><br>' . "\n",
+      '!line4' => '<span class="administrative-area">台北市</span><span class="locality">大安區</span><br>' . "\n",
+      '!line5' => '<span class="address-line1">Sec. 3 Hsin-yi Rd.</span><br>' . "\n",
+      '!line6' => '<span class="organization">Giant &lt;h2&gt;Bike&lt;/h2&gt; Store</span><br>' . "\n",
+      '!line7' => '<span class="recipient">Mr. Liu</span>',
+      '!line8' => '</p>',
+    ]);
+    $this->assertRaw($expected, 'The TW address has been properly formatted.');
+  }
+
+  /**
+   * Tests US address formatting.
+   */
+  public function testUnitedStatesIncompleteAddress() {
+    $entity = EntityTest::create([]);
+    $entity->{$this->fieldName} = [
+      'country_code' => 'US',
+      'administrative_area' => 'US-CA',
+      'address_line1' => '1098 Alta Ave',
+      'postal_code' => '94043',
+    ];
+    $this->renderEntityFields($entity, $this->display);
+    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
+      '!line1' => '<p translate="no">',
+      '!line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
+      '!line3' => '<span class="administrative-area">CA</span> <span class="postal-code">94043</span><br>' . "\n",
+      '!line4' => '<span class="country">United States</span>',
+      '!line5' => '</p>',
+    ]);
+    $this->assertRaw($expected, 'The US address has been properly formatted.');
+
+    // Now add the locality, but remove the administrative area.
+    $entity->{$this->fieldName}->first()->setLocality('Mountain View')
+                                        ->setAdministrativeArea('');
+    $this->renderEntityFields($entity, $this->display);
+    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
+      '!line1' => '<p translate="no">',
+      '!line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
+      '!line3' => '<span class="locality">Mountain View</span>, <span class="postal-code">94043</span><br>' . "\n",
+      '!line4' => '<span class="country">United States</span>',
+      '!line5' => '</p>',
+    ]);
+    $this->assertRaw($expected, 'The US address has been properly formatted.');
   }
 
   /**
