@@ -150,7 +150,7 @@ class DefaultFormatterTest extends KernelTestBase {
       'organization' => 'Giant <h2>Bike</h2> Store',
       'recipient' => 'Mr. Liu',
     ];
-    $a = $this->renderEntityFields($translation, $this->display);
+    $this->renderEntityFields($translation, $this->display);
     $expected = SafeMarkup::format('!line1!line2!line3!line4!line5!line6!line7!line8', [
       '!line1' => '<p translate="no">',
       '!line2' => '<span class="country">台灣</span><br>' . "\n",
