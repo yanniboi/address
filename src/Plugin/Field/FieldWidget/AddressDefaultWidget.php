@@ -271,6 +271,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       '#title' => $this->t('Country'),
       '#options' => $countryList,
       '#default_value' => $countryCode,
+      '#required' => $element['#required'],
       '#empty_value' => '',
       '#limit_validation_errors' => [],
       '#element_validate' => [
