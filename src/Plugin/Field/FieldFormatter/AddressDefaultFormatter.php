@@ -184,7 +184,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    * @return string
    *   The new rendered element.
    */
-  public static function postRender($content, $element) {
+  public static function postRender($content, array $element) {
     $addressFormat = $element['address_format']['#value'];
     $formatString = $addressFormat->getFormat();
     // Add the country to the bottom or the top of the format string,
