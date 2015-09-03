@@ -37,6 +37,41 @@ address.address_format.*:
       type: string
       label: 'Postal code prefix'
 
+field.value.address:
+  type: mapping
+  label: 'Default value'
+  mapping:
+    country_code:
+      type: string
+      label: 'Country code'
+    administrative_area:
+      type: string
+      label: 'Administrative area'
+    locality:
+      type: string
+      label: 'Locality'
+    dependent_locality:
+      type: string
+      label: 'Dependent locality'
+    postal_code:
+      type: string
+      label: 'Postal code'
+    sorting_code:
+      type: string
+      label: 'Sorting code'
+    address_line1:
+      type: string
+      label: 'First line of the address block'
+    address_line2:
+      type: string
+      label: 'Second line of the address block'
+    organization:
+      type: string
+      label: 'Organization'
+    recipient:
+      type: string
+      label: 'Recipient'
+
 field.field_settings.address:
   type: mapping
   label: 'Address field settings'
