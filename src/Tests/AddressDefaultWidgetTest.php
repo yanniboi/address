@@ -151,7 +151,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
   }
 
   /**
-   * Test widget's initial values, default country and alter event.
+   * Test widget's initial values, default country and alter events.
    */
   function testInitialValues() {
     $fieldName = $this->fieldInstance->getName();
@@ -166,26 +166,52 @@ class AddressDefaultWidgetTest extends WebTestBase {
         ],
       ])->save();
 
-    // Set address field required, 'default_country' setting should be set in article add form.
-    $edit['required'] = TRUE;
-    $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
-    $this->assertResponse(200);
-    $this->drupalGet($this->formFieldConfigUrl);
-    $this->assertFieldChecked('edit-required', 'Address field set to required.');
-    $this->drupalGet($this->formContentAddUrl);
-    $this->assertOptionSelected('edit-field-address-0-country-code', 'US');
-    $this->assertTrue((bool) $this->xpath('//select[@name="'. $fieldName .'[0][country_code]" and boolean(@required)]'), 'Country code field is required on form '. $this->formContentAddUrl);
-
     // Set address field optional, 'None' should be set in article add form.
     $edit['required'] = FALSE;
     $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
     $this->assertResponse(200);
-    $this->drupalGet($this->formFieldConfigUrl);
-    $this->assertNoFieldChecked('edit-required', 'Address field set to optional.');
     $this->drupalGet($this->formContentAddUrl);
     $this->assertOptionSelected('edit-field-address-0-country-code', '', 'Option None for field edit-field-address-0-country-code is selected.');
 
-    // @todo Initial values event alter test.
+    // Set address field required, 'default_country' setting should be set in article add form.
+    $edit['required'] = TRUE;
+    $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
+    $this->assertResponse(200);
+    $this->drupalGet($this->formContentAddUrl);
+    $this->assertOptionSelected('edit-field-address-0-country-code', 'US');
+    $this->assertTrue((bool) $this->xpath('//select[@name="'. $fieldName .'[0][country_code]" and boolean(@required)]'), 'Country code field is required on form '. $this->formContentAddUrl);
+
+    // Test address events.
+    // The address_test module is installed here, not in setUp().
+    // This way the module's events will not affect other tests.
+    self::$modules[] = 'address_test';
+    $container = $this->initKernel(\Drupal::request());
+    $this->initConfig($container);
+    $this->installModulesFromClassProperty($container);
+    $this->restoreBatch();
+    $this->rebuildAll();
+    // Get available countries and initial values from module's event subscriber.
+    $subscriber = \Drupal::service('address_test.event_subscriber');
+    $availableCountries = array_keys($subscriber->getAvailableCountries());
+    $initialValues = $subscriber->getInitialValues();
+    // Access the content add form and test the list of countries.
+    $this->drupalGet($this->formContentAddUrl);
+    $options = [];
+    $elements = $this->xpath('//select[@name="'. $fieldName .'[0][country_code]"]/option/@value');
+    foreach ($elements as $key => $element) {
+      if ($option = $element->__toString()) {
+        $options[] = $option;
+      }
+    }
+    $this->assertFieldValues($options, $availableCountries, 'Available countries set in the available countries event subscriber and present in the widget: '. implode(', ', $options));
+    // Test the values of the fields.
+    foreach ($initialValues as $key => $value) {
+      if ($value) {
+        $this->assertFieldByName($fieldName .'[0]['. $key .']', $value, 'Field '. $key .' set to initial value '. $value .' in form '. $this->formContentAddUrl .' from the initial values event subscriber.');
+      }
+    }
+    // Remove the address_test module.
+    array_pop(self::$modules);
   }
 
   /**
