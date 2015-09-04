@@ -186,8 +186,8 @@ class DefaultFormatterTest extends KernelTestBase {
     $this->assertRaw($expected, 'The US address has been properly formatted.');
 
     // Now add the locality, but remove the administrative area.
-    $entity->{$this->fieldName}->first()->setLocality('Mountain View')
-                                        ->setAdministrativeArea('');
+    $entity->{$this->fieldName}->locality = 'Mountain View';
+    $entity->{$this->fieldName}->administrative_area = '';
     $this->renderEntityFields($entity, $this->display);
     $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
       '!line1' => '<p translate="no">',
