@@ -205,26 +205,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public function setLocale($locale) {
-    // Our locale comes from the parent entity, so it can't be changed here.
-    // Luckily, the setters aren't actually used by the commerceguys/addressing
-    // validator and formatter.
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCountryCode() {
     return $this->country_code;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCountryCode($countryCode) {
-    $this->country_code = $countryCode;
-    return $this;
   }
 
   /**
@@ -237,24 +219,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public function setAdministrativeArea($administrativeArea) {
-    $this->administrative_area = $administrativeArea;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getLocality() {
     return $this->locality;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setLocality($locality) {
-    $this->locality = $locality;
-    return $this;
   }
 
   /**
@@ -267,24 +233,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public function setDependentLocality($dependentLocality) {
-    $this->dependent_locality = $dependentLocality;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getPostalCode() {
     return $this->postal_code;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPostalCode($postalCode) {
-    $this->postal_code = $postalCode;
-    return $this;
   }
 
   /**
@@ -297,24 +247,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public function setSortingCode($sortingCode) {
-    $this->sorting_code = $sortingCode;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getAddressLine1() {
     return $this->address_line1;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setAddressLine1($addressLine1) {
-    $this->address_line1 = $addressLine1;
-    return $this;
   }
 
   /**
@@ -327,24 +261,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public function setAddressLine2($addressLine2) {
-    $this->address_line2 = $addressLine2;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getOrganization() {
     return $this->organization;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOrganization($organization) {
-    $this->organization = $organization;
-    return $this;
   }
 
   /**
@@ -354,11 +272,4 @@ class AddressItem extends FieldItemBase implements AddressInterface {
     return $this->recipient;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setRecipient($recipient) {
-    $this->recipient = $recipient;
-    return $this;
-  }
 }
