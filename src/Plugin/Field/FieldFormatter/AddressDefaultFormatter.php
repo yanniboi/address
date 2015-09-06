@@ -13,7 +13,7 @@ use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\address\AddressInterface;
 use Drupal\address\FieldHelper;
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -153,7 +153,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
       '#type' => 'html_tag',
       '#tag' => 'span',
       '#attributes' => ['class' => ['country']],
-      '#value' => SafeMarkup::checkPlain($countries[$countryCode]),
+      '#value' => Html::escape($countries[$countryCode]),
       '#placeholder' => '%country',
     ];
     foreach ($addressFormat->getUsedFields() as $field) {
@@ -164,7 +164,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
         '#type' => 'html_tag',
         '#tag' => 'span',
         '#attributes' => ['class' => [$class]],
-        '#value' => SafeMarkup::checkPlain($values[$field]),
+        '#value' => Html::escape($values[$field]),
         '#placeholder' => '%' . $field,
       ];
     }
