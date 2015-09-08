@@ -7,12 +7,12 @@
 
 namespace Drupal\address\Entity;
 
+use Drupal\address\AddressFormatInterface;
 use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Enum\AdministrativeAreaType;
 use CommerceGuys\Addressing\Enum\DependentLocalityType;
 use CommerceGuys\Addressing\Enum\LocalityType;
 use CommerceGuys\Addressing\Enum\PostalCodeType;
-use CommerceGuys\Addressing\Model\AddressFormatInterface;
 use CommerceGuys\Addressing\Model\SubdivisionInterface;
 use CommerceGuys\Addressing\Model\FormatStringTrait;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
