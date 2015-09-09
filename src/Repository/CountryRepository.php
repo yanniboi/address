@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\address\CountryRepository.
+ * Contains \Drupal\address\Repository\CountryRepository.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Repository;
 
 use CommerceGuys\Intl\Country\CountryRepository as ExternalCountryRepository;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface as AddressingCountryRepositoryInterface;

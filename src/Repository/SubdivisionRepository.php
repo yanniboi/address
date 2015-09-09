@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\address\SubdivisionRepository.
+ * Contains \Drupal\address\Repository\SubdivisionRepository.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Repository;
 
 use CommerceGuys\Addressing\Repository\SubdivisionRepository as ExternalSubdivisionRepository;
 use Drupal\Core\Cache\CacheBackendInterface;

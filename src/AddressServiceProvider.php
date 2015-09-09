@@ -22,7 +22,7 @@ class AddressServiceProvider extends ServiceProviderBase {
   public function alter(ContainerBuilder $container) {
     $definition = $container->getDefinition('country_manager');
     $definition
-      ->setClass('Drupal\address\CountryRepository')
+      ->setClass('Drupal\address\Repository\CountryRepository')
       ->setArguments([new Reference('cache.default'), new Reference('language_manager')]);
   }
 

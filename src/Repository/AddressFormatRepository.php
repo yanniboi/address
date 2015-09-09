@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\address\AddressFormatRepository.
+ * Contains \Drupal\address\Repository\AddressFormatRepository.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Repository;
 
 use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use Drupal\Core\Entity\EntityManagerInterface;

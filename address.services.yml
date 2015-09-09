@@ -4,13 +4,13 @@ services:
     arguments: ['@entity.manager', '@language_manager']
 
   address.address_format_repository:
-    class: Drupal\address\AddressFormatRepository
+    class: Drupal\address\Repository\AddressFormatRepository
     arguments: ['@entity.manager', '@language_manager']
 
   address.country_repository:
-    class: Drupal\address\CountryRepository
+    class: Drupal\address\Repository\CountryRepository
     arguments: ['@cache.data', '@language_manager']
 
   address.subdivision_repository:
-    class: Drupal\address\SubdivisionRepository
+    class: Drupal\address\Repository\SubdivisionRepository
     arguments: ['@cache.data', '@language_manager']
