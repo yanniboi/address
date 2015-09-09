@@ -11,6 +11,7 @@ use CommerceGuys\Addressing\Repository\AddressFormatRepository;
 use Drupal\address\Entity\AddressFormat;
 use Drupal\Core\Locale\CountryManager;
 use Drupal\simpletest\WebTestBase;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Tests the address format entity and UI.
@@ -130,12 +131,21 @@ class AddressFormatTest extends WebTestBase {
   }
 
   /**
-   * Tests deleting a address format for countryCode = ZZ via a form.
+   * Tests deleting a address format for countryCode = ZZ via a form and from the API.
    */
   function testAddressFormatDeleteZZ() {
     $countryCode = 'ZZ';
     $this->drupalGet('admin/config/regional/address-formats/manage/' . $countryCode . '/delete');
-    $this->assertResponse(404, 'The delete form for the Generic address format cannot be accessed.');
+    $this->assertResponse(403, "The delete form for the 'ZZ' address format cannot be accessed.");
+    // Try deleting ZZ from the API
+    $addressFormat = AddressFormat::load($countryCode);
+    try {
+      $addressFormat->delete();
+      $this->fail("The 'ZZ' address format can't be deleted.");
+    }
+    catch (EntityStorageException $e) {
+      $this->assertEqual("The 'ZZ' address format can't be deleted.", $e->getMessage());
+    }
   }
 
 }

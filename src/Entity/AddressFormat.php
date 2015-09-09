@@ -31,6 +31,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "delete" = "Drupal\address\Form\AddressFormatDeleteForm"
  *     },
  *     "list_builder" = "Drupal\address\AddressFormatListBuilder",
+ *     "access" = "Drupal\address\AddressFormatAccessControlHandler",
+ *     "storage" = "Drupal\address\AddressFormatStorage",
  *   },
  *   admin_permission = "administer address formats",
  *   config_prefix = "address_format",
