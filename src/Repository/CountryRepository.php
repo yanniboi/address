@@ -8,7 +8,7 @@
 namespace Drupal\address\Repository;
 
 use CommerceGuys\Intl\Country\CountryRepository as ExternalCountryRepository;
-use CommerceGuys\Addressing\Repository\CountryRepositoryInterface as AddressingCountryRepositoryInterface;
+use CommerceGuys\Addressing\Repository\CountryRepositoryInterface as ExternalCountryRepositoryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Locale\CountryManagerInterface;
@@ -18,7 +18,7 @@ use Drupal\Core\Locale\CountryManagerInterface;
  *
  * Countries are stored on disk in JSON and cached inside Drupal.
  */
-class CountryRepository extends ExternalCountryRepository implements AddressingCountryRepositoryInterface, CountryManagerInterface {
+class CountryRepository extends ExternalCountryRepository implements ExternalCountryRepositoryInterface, CountryManagerInterface {
 
   /**
    * The cache backend.
@@ -67,7 +67,7 @@ class CountryRepository extends ExternalCountryRepository implements AddressingC
       // Merge-in base definitions.
       $baseDefinitions = $this->loadBaseDefinitions();
       foreach ($this->definitions[$locale] as $countryCode => $definition) {
-        $this->definitions[$locale][$countryCode] += $this->baseDefinitions[$countryCode];
+        $this->definitions[$locale][$countryCode] += $baseDefinitions[$countryCode];
       }
       $this->cache->set($cacheKey, $this->definitions[$locale], CacheBackendInterface::CACHE_PERMANENT, ['countries']);
     }

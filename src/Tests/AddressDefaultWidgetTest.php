@@ -553,7 +553,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
       $dependentLocalities = [];
       $keys = array_keys($administrativeAreas);
       $depth = $this->subdivisionRepository->getDepth($country);
-      // On article add form there should be administrative area as a dropdown with $subdivisiions list.
+      // On article add form there should be an administrative area dropdown.
       $this->drupalGet($this->formContentAddUrl);
       $options = [];
       $elements = $this->xpath('//select[@name="'. $fieldName .'[0][administrative_area]"]/option/@value');

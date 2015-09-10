@@ -13,7 +13,6 @@ use Drupal\address\Event\AvailableCountriesEvent;
 use Drupal\address\AddressInterface;
 use Drupal\address\LabelHelper;
 use Drupal\Core\Field\FieldItemBase;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;

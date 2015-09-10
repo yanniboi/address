@@ -8,8 +8,6 @@
 namespace Drupal\address\Form;
 
 use Drupal\Core\Entity\EntityDeleteForm;
-use Drupal\Core\Locale\CountryManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the form to delete an address format.

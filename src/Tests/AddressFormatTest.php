@@ -9,7 +9,6 @@ namespace Drupal\address\Tests;
 
 use CommerceGuys\Addressing\Repository\AddressFormatRepository;
 use Drupal\address\Entity\AddressFormat;
-use Drupal\Core\Locale\CountryManager;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Entity\EntityStorageException;
 
@@ -119,7 +118,6 @@ class AddressFormatTest extends WebTestBase {
    */
   public function testAddressFormatDeletion() {
     $countryCode = 'RS';
-    $addressFormat = AddressFormat::load($countryCode);
     $this->drupalGet('admin/config/regional/address-formats/manage/' . $countryCode . '/delete');
     $this->assertResponse(200, 'The address format delete form can be accessed at admin/config/regional/address-formats/manage.'
       . $countryCode . '/delete');

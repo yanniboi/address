@@ -13,10 +13,8 @@ use CommerceGuys\Addressing\Enum\AdministrativeAreaType;
 use CommerceGuys\Addressing\Enum\DependentLocalityType;
 use CommerceGuys\Addressing\Enum\LocalityType;
 use CommerceGuys\Addressing\Enum\PostalCodeType;
-use CommerceGuys\Addressing\Model\SubdivisionInterface;
 use CommerceGuys\Addressing\Model\FormatStringTrait;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the AddressFormat configuration entity.
