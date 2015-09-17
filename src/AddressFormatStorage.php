@@ -20,7 +20,7 @@ class AddressFormatStorage extends ConfigEntityStorage {
    */
   protected function doDelete($entities) {
     // ZZ is the fallback address format and it must always be present.
-    if (array_key_exists('ZZ', $entities)) {
+    if (array_key_exists('ZZ', $entities) && current($entities)->isUninstalling() === FALSE) {
       throw new EntityStorageException("The 'ZZ' address format can't be deleted.");
     }
     parent::doDelete($entities);
