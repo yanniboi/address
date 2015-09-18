@@ -21,6 +21,8 @@ use CommerceGuys\Zone\Exception\UnexpectedTypeException;
  *   label = @Translation("Zone"),
  *   handlers = {
  *     "form" = {
+ *       "add" = "Drupal\address\Form\ZoneForm",
+ *       "edit" = "Drupal\address\Form\ZoneForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
  *     "list_builder" = "Drupal\address\ZoneListBuilder"
@@ -37,6 +39,11 @@ use CommerceGuys\Zone\Exception\UnexpectedTypeException;
  *     "scope",
  *     "priority",
  *     "members",
+ *   },
+ *   links = {
+ *     "collection" = "/admin/config/regional/zones",
+ *     "edit-form" = "/admin/config/regional/zones/manage/{zone}",
+ *     "delete-form" = "/admin/config/regional/zones/manage/{zone}/delete"
  *   }
  * )
  */

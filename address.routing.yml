@@ -29,3 +29,43 @@ entity.address_format.delete_form:
     _title: 'Delete an address format'
   requirements:
     _entity_access: 'address_format.delete'
+
+entity.zone.collection:
+  path: '/admin/config/regional/zones'
+  defaults:
+    _entity_list: 'zone'
+    _title: 'Zones'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer zones'
+
+entity.zone.add_form:
+  path: '/admin/config/regional/zones/add'
+  defaults:
+    _entity_form: 'zone.add'
+    _title: 'Add a new zone'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer zones'
+
+entity.zone.edit_form:
+  path: '/admin/config/regional/zones/{zone}/edit'
+  defaults:
+    _entity_form: 'zone.edit'
+    _title: 'Edit a zone'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer zones'
+
+entity.zone.delete_form:
+  path: '/admin/config/regional/zones/{zone}/delete'
+  defaults:
+    _entity_form: 'zone.delete'
+    _title: 'Delete a zone'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer zones'
