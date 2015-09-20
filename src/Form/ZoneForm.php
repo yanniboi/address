@@ -8,10 +8,7 @@
 namespace Drupal\address\Form;
 
 use Drupal\address\ZoneMemberManager;
-use Drupal\address\Entity\Zone;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Html;
@@ -20,30 +17,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ZoneForm extends EntityForm {
 
   /**
-   * The zone storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $zoneStorage;
-
-  /**
    * The zone member plugin manager.
    *
    * @var \Drupal\address\ZoneMemberManager
    */
-  protected $zoneMemberManager;
+  protected $memberManager;
 
   /**
    * Creates a ZoneForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityManager $entityManager
-   *   The entity manager.
-   * @param \Drupal\address\ZoneMemberManager $zone_member_manager
+   * @param \Drupal\address\ZoneMemberManager $memberManager
    *   The zone member plugin manager.
    */
-  public function __construct(EntityManager $entityManager, ZoneMemberManager $zone_member_manager) {
-    $this->zoneStorage = $entityManager->getStorage('zone');
-    $this->zoneMemberManager = $zone_member_manager;
+  public function __construct(ZoneMemberManager $memberManager) {
+    $this->memberManager = $memberManager;
   }
 
   /**
@@ -51,7 +38,6 @@ class ZoneForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager'),
       $container->get('plugin.manager.address.zone_member')
     );
   }
@@ -60,7 +46,6 @@ class ZoneForm extends EntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $formState) {
-    $input = $formState->getUserInput();
     $zone = $this->entity;
 
     $form['#tree'] = TRUE;
@@ -97,7 +82,151 @@ class ZoneForm extends EntityForm {
       '#delta' => 10,
     ];
 
+    $wrapperId = Html::getUniqueId('zone-members-ajax-wrapper');
+    $form['members'] = [
+      '#type' => 'table',
+      '#header' => [
+        $this->t('Type'),
+        $this->t('Zone member'),
+        $this->t('Operations'),
+      ],
+      '#empty' => t('There are currently no zone members in this zone. Add one by selecting an option below.'),
+      '#weight' => 5,
+      '#prefix' => '<div id="' . $wrapperId . '">',
+      '#suffix' => '</div>',
+    ];
+
+    $index = 0;
+    foreach ($this->entity->getMembers() as $key => $member) {
+      $memberForm = &$form['members'][$index];
+      $memberForm['type'] = [
+        '#type' => 'markup',
+        '#markup' => $member->getPluginDefinition()['name'],
+      ];
+      $memberValues = $formState->getValue(['members', $index], []);
+      $memberFormState = new FormState();
+      $memberFormState->setValues($memberValues);
+      $memberForm['form'] = $member->buildConfigurationForm([], $formState);
+      $memberForm['form']['#element_validate'] = ['::memberFormValidate'];
+      $memberForm['remove'] = [
+        '#type' => 'submit',
+        '#name' => 'remove_member' . $index,
+        '#value' => $this->t('Remove'),
+        '#limit_validation_errors' => [],
+        '#submit' => ['::removeMemberSubmit'],
+        '#member_index' => $index,
+        '#ajax' => [
+          'callback' => '::membersAjax',
+          'wrapper' => $wrapperId,
+        ],
+      ];
+
+      $index++;
+    }
+
+    $plugins = [];
+    foreach ($this->memberManager->getDefinitions() as $plugin => $definition) {
+      $plugins[$plugin] = $definition['name'];
+    }
+    $form['members']['_new'] = [
+      '#tree' => FALSE,
+    ];
+    $form['members']['_new']['type'] = [
+      '#prefix' => '<div class="zone-member-new">',
+      '#suffix' => '</div>',
+    ];
+    $form['members']['_new']['type']['plugin'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Zone member type'),
+      '#title_display' => 'invisible',
+      '#options' => $plugins,
+      '#empty_value' => '',
+    ];
+    $form['members']['_new']['type']['add_member'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Add'),
+      '#validate' => ['::addMemberValidate'],
+      '#submit' => ['::addMemberSubmit'],
+      '#ajax' => [
+        'callback' => '::membersAjax',
+        'wrapper' => $wrapperId,
+      ],
+    ];
+    $form['members']['_new']['member'] = [
+      'data' => [],
+    ];
+    $form['members']['_new']['operations'] = [
+      'data' => [],
+    ];
+
     return parent::form($form, $formState);
+  }
+
+  /**
+   * Ajax callback for member operations.
+   */
+  public function membersAjax(array $form, FormStateInterface $formState) {
+    return $form['members'];
+  }
+
+  /**
+   * Validation callback for adding a zone member.
+   */
+  public function addMemberValidate(array $form, FormStateInterface $formState) {
+    if (!$formState->getValue('plugin')) {
+      $formState->setErrorByName('plugin', $this->t('Select a zone member type to add.'));
+    }
+  }
+
+  /**
+   * Submit callback for adding a zone member.
+   */
+  public function addMemberSubmit(array $form, FormStateInterface $formState) {
+    $pluginId = $formState->getValue('plugin');
+    $member = $this->memberManager->createInstance($pluginId);
+    $this->entity->addMember($member);
+    $formState->setRebuild();
+  }
+
+  /**
+   * Submit callback for removing a zone member.
+   */
+  public function removeMemberSubmit(array $form, FormStateInterface $formState) {
+    $memberIndex = $formState->getTriggeringElement()['#member_index'];
+    $member = $form['members'][$memberIndex]['form']['#member'];
+    $this->entity->removeMember($member);
+    $formState->setRebuild();
+  }
+
+  /**
+   * Validation callback for the embedded zone member form.
+   */
+  public function memberFormValidate($memberForm, FormStateInterface $formState) {
+    $member = $memberForm['#member'];
+    $memberFormState = new FormState();
+    $memberFormState->setValues($formState->getValue($memberForm['#parents'], []));
+    $member->validateConfigurationForm($memberForm, $memberFormState);
+    // Update form state with values that might have been changed by the plugin.
+    $formState->setValue($memberForm['#parents'], $memberFormState->getValues());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $formState) {
+    parent::submitForm($form, $formState);
+
+    foreach ($formState->getValue(['members']) as $memberIndex => $values) {
+      $memberForm = $form['members'][$memberIndex]['form'];
+      $member = $memberForm['#member'];
+      $memberFormState = new FormState();
+      $memberFormState->setValues($formState->getValue($memberForm['#parents'], []));
+      $member->submitConfigurationForm($memberForm, $memberFormState);
+      // Update form state with values that might have been changed by the plugin.
+      $formState->setValue($memberForm['#parents'], $memberFormState->getValues());
+      // Update the member on the entity.
+      $this->entity->getMembers()->addInstanceId($member->getId(), $member->getConfiguration());
+    }
   }
 
   /**

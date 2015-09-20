@@ -32,7 +32,7 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
 
     $this->setConfiguration($configuration);
     if (isset($pluginDefinition['parent_zone'])) {
-      $this->parentZone = $parentZone;
+      $this->parentZone = $pluginDefinition['parent_zone'];
     }
   }
 
