@@ -57,6 +57,7 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
     return [
       'id' => '',
       'name' => '',
+      'plugin' => $this->pluginDefinition['id'],
     ];
   }
 

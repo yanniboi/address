@@ -169,7 +169,7 @@ class Zone extends ConfigEntityBase implements ZoneInterface {
   public function getMembers() {
     if (!$this->membersCollection) {
       $pluginManager = $this->getZoneMemberPluginManager();
-      $this->membersCollection = new ZoneMemberPluginCollection($pluginManager, $this->members, $zone);
+      $this->membersCollection = new ZoneMemberPluginCollection($pluginManager, $this->members, $this);
       $this->membersCollection->sort();
     }
     return $this->membersCollection;
@@ -205,9 +205,7 @@ class Zone extends ConfigEntityBase implements ZoneInterface {
    * {@inheritdoc}
    */
   public function removeMember(ZoneMemberInterface $member) {
-    if ($this->hasMember($member)) {
-      $this->getMembers()->removeInstanceId($member->getId());
-    }
+    $this->getMembers()->removeInstanceId($member->getId());
     return $this;
   }
 
@@ -215,7 +213,7 @@ class Zone extends ConfigEntityBase implements ZoneInterface {
    * {@inheritdoc}
    */
   public function hasMember(ZoneMemberInterface $member) {
-    return $this->getMembers()->has($member);
+    return $this->getMembers()->has($member->getId());
   }
 
   /**

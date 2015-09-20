@@ -9,11 +9,17 @@ namespace Drupal\address;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
+use Drupal\Component\Plugin\PluginManagerInterface;
 
 /**
  * A collection of zone members.
  */
 class ZoneMemberPluginCollection extends DefaultLazyPluginCollection {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $pluginKey = 'plugin';
 
   /**
    * The parent zone.

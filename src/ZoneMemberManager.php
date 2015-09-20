@@ -61,10 +61,10 @@ class ZoneMemberManager extends DefaultPluginManager {
     }
     // If the plugin provides a factory method, pass the container to it.
     if (is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
-      $plugin = $plugin_class::create(\Drupal::getContainer(), $configuration, $pluginId, $pluginDefinition, $migration);
+      $plugin = $plugin_class::create(\Drupal::getContainer(), $configuration, $pluginId, $pluginDefinition, $parentZone);
     }
     else {
-      $plugin = new $plugin_class($configuration, $pluginId, $pluginDefinition, $migration);
+      $plugin = new $plugin_class($configuration, $pluginId, $pluginDefinition, $parentZone);
     }
 
     return $plugin;
