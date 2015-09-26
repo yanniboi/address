@@ -13,6 +13,7 @@ use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\address\AddressInterface;
 use Drupal\address\FieldHelper;
+use Drupal\address\Entity\AddressFormatInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -141,10 +142,10 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *   A renderable array.
    */
   protected function viewElement(AddressInterface $address) {
-    $values = $this->getValues($address);
     $countryCode = $address->getCountryCode();
-    $addressFormat = $this->addressFormatRepository->get($countryCode, $address->getLocale());
     $countries = $this->countryRepository->getList();
+    $addressFormat = $this->addressFormatRepository->get($countryCode, $address->getLocale());
+    $values = $this->getValues($address, $addressFormat);
 
     $element = [];
     $element['address_format'] = [
@@ -249,11 +250,13 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *
    * @param \Drupal\address\AddressInterface $address
    *   The address.
+   * @param \Drupal\address\Entity\AddressFormatInterface $addressFormat
+   *   The address format.
    *
    * @return array
    *   The values, keyed by address field.
    */
-  protected function getValues(AddressInterface $address) {
+  protected function getValues(AddressInterface $address, AddressFormatInterface $addressFormat) {
     $values = [];
     foreach (AddressField::getAll() as $field) {
       $getter = 'get' . ucfirst($field);
@@ -261,12 +264,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
     }
 
     // Replace the subdivision values with the names of any predefined ones.
-    $subdivisionFields = [
-      AddressField::ADMINISTRATIVE_AREA,
-      AddressField::LOCALITY,
-      AddressField::DEPENDENT_LOCALITY,
-    ];
-    foreach ($subdivisionFields as $field) {
+    foreach ($addressFormat->getUsedSubdivisionFields() as $field) {
       if (empty($values[$field])) {
         // This level is empty, so there can be no sublevels.
         break;

@@ -97,6 +97,31 @@ class DefaultFormatterTest extends KernelTestBase {
   }
 
   /**
+   * Tests Andorra address formatting.
+   */
+  public function testAndorraAddress() {
+    $entity = EntityTest::create([]);
+    $entity->{$this->fieldName} = [
+      'country_code' => 'AD',
+      'locality' => 'AD-07',
+      'postal_code' => 'AD500',
+      'address_line1' => 'C. Prat de la Creu, 62-64',
+    ];
+
+    $this->renderEntityFields($entity, $this->display);
+    // Andorra has no predefined administrative areas, but it does have
+    // predefined localities, which must be shown.
+    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
+      '!line1' => '<p translate="no">',
+      '!line2' => '<span class="address-line1">C. Prat de la Creu, 62-64</span><br>' . "\n",
+      '!line3' => '<span class="postal-code">AD500</span> <span class="locality">Parròquia d&#039;Andorra la Vella</span><br>' . "\n",
+      '!line4' => '<span class="country">Andorra</span>',
+      '!line5' => '</p>',
+    ]);
+    $this->assertRaw($expected, 'The AD address has been properly formatted.');
+  }
+
+  /**
    * Tests El Salvador address formatting.
    */
   public function testElSalvadorAddress() {

@@ -11,6 +11,7 @@ use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Repository\CountryRepositoryInterface;
 use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
+use Drupal\address\Entity\AddressFormatInterface;
 use Drupal\address\Event\AddressEvents;
 use Drupal\address\Event\InitialValuesEvent;
 use Drupal\address\FieldHelper;
@@ -354,7 +355,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element[$property]['#access'] = FALSE;
     }
     // Add predefined options to the created subdivision elements.
-    $element = $this->processSubdivisionElements($element, $values);
+    $element = $this->processSubdivisionElements($element, $values, $addressFormat);
 
     return $element;
   }
@@ -366,29 +367,30 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The existing form element array.
    * @param array $values
    *   An array of address values, keyed by property name.
+   * @param \Drupal\address\Entity\AddressFormatInterface $addressFormat
+   *   The address format.
    *
    * @return array
    *   The processed form element array.
    */
-  protected function processSubdivisionElements(array $element, array $values) {
+  protected function processSubdivisionElements(array $element, array $values, AddressFormatInterface $addressFormat) {
     $depth = $this->subdivisionRepository->getDepth($values['country_code']);
     if ($depth === 0) {
       // No predefined data found.
       return $element;
     }
 
-    // Add a parent id to each found subdivision element.
-    $subdivisionProperties = [
-      'administrative_area' => NULL,
-      'locality' => 'administrative_area',
-      'dependent_locality' => 'locality',
-    ];
+    $subdivisionProperties = [];
+    foreach ($addressFormat->getUsedSubdivisionFields() as $field) {
+      $subdivisionProperties[] = FieldHelper::getPropertyName($field);
+    }
     // Load and insert the subdivisions for each parent id.
     $currentDepth = 1;
-    foreach ($subdivisionProperties as $property => $parentProperty) {
+    foreach ($subdivisionProperties as $index => $property) {
       if (!isset($element[$property]) || !Element::isVisibleElement($element[$property])) {
         break;
       }
+      $parentProperty = $index ? $subdivisionProperties[$index - 1] : NULL;
       if ($parentProperty && empty($values[$parentProperty])) {
         break;
       }
