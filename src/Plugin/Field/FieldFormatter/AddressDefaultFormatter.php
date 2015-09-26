@@ -17,6 +17,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -117,6 +118,11 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
         '#suffix' => '</p>',
         '#post_render' => [
           [get_class($this), 'postRender'],
+        ],
+        '#cache' => [
+          'contexts' => [
+            'languages:' . LanguageInterface::TYPE_INTERFACE,
+          ],
         ],
       ];
       $elements[$delta] += $this->viewElement($item);
