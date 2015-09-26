@@ -8,7 +8,6 @@
 namespace Drupal\address\Plugin\ZoneMember;
 
 use CommerceGuys\Addressing\Model\AddressInterface;
-use Drupal\address\ZoneMemberBase;
 
 /**
  * Matches EU addresses.

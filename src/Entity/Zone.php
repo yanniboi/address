@@ -6,8 +6,7 @@
 
 namespace Drupal\address\Entity;
 
-use Drupal\address\ZoneInterface;
-use Drupal\address\ZoneMemberInterface;
+use Drupal\address\Plugin\ZoneMember\ZoneMemberInterface;
 use Drupal\address\ZoneMemberPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use CommerceGuys\Addressing\Model\AddressInterface;

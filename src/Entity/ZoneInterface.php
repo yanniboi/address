@@ -2,11 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\address\ZoneInterface.
+ * Contains \Drupal\address\Entity\ZoneInterface.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Entity;
 
+use Drupal\address\Plugin\ZoneMember\ZoneMemberInterface;
 use CommerceGuys\Zone\Model\ZoneInterface as ExternalZoneInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;

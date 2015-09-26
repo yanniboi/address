@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\address\ZoneMemberInterface.
+ * Contains \Drupal\address\Plugin\ZoneMember\ZoneMemberInterface.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Plugin\ZoneMember;
 
 use CommerceGuys\Zone\Model\ZoneMemberInterface as ExternalZoneMemberInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\ConfigurablePluginInterface;
 
 /**
- * Defines the interface for zone memberss.
+ * Defines the interface for zone members.
  */
 interface ZoneMemberInterface extends ExternalZoneMemberInterface, ConfigurablePluginInterface, PluginFormInterface {
 }

@@ -8,7 +8,6 @@
 namespace Drupal\address\Plugin\ZoneMember;
 
 use CommerceGuys\Addressing\Model\AddressInterface;
-use Drupal\address\ZoneMemberBase;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;

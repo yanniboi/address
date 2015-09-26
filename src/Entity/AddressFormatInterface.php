@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\address\AddressFormatInterface.
+ * Contains \Drupal\address\Entity\AddressFormatInterface.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Entity;
 
 use CommerceGuys\Addressing\Model\AddressFormatEntityInterface as ExternalAddressFormatInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;

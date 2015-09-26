@@ -7,6 +7,7 @@
 
 namespace Drupal\address;
 
+use Drupal\address\Entity\ZoneInterface;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -24,14 +25,14 @@ class ZoneMemberPluginCollection extends DefaultLazyPluginCollection {
   /**
    * The parent zone.
    *
-   * @var \Drupal\address\ZoneInterface
+   * @var \Drupal\address\Entity\ZoneInterface
    */
   protected $parentZone;
 
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\address\ZoneInterface $parentZone
+   * @param \Drupal\address\Entity\ZoneInterface $parentZone
    *   The parent zone.
    */
   public function __construct(PluginManagerInterface $manager, array $configurations, ZoneInterface $parentZone) {

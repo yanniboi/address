@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\address\ZoneMemberBase.
+ * Contains \Drupal\address\Plugin\ZoneMember\ZoneMemberBase.
  */
 
-namespace Drupal\address;
+namespace Drupal\address\Plugin\ZoneMember;
 
 use CommerceGuys\Addressing\Model\AddressInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -20,7 +20,7 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
   /**
    * The parent zone.
    *
-   * @var \Drupal\address\ZoneInterface
+   * @var \Drupal\address\Entity\ZoneInterface
    */
   protected $parentZone;
 

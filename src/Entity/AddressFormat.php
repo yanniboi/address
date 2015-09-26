@@ -7,7 +7,6 @@
 
 namespace Drupal\address\Entity;
 
-use Drupal\address\AddressFormatInterface;
 use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Addressing\Enum\AdministrativeAreaType;
 use CommerceGuys\Addressing\Enum\DependentLocalityType;

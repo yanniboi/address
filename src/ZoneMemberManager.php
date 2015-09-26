@@ -7,11 +7,12 @@
 
 namespace Drupal\address;
 
+use Drupal\address\Entity\ZoneInterface;
+use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Component\Uuid\UuidInterface;
-use Drupal\Component\Plugin\Factory\DefaultFactory;
 
 /**
  * Manages zone member plugins.

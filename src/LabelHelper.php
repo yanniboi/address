@@ -12,7 +12,7 @@ use CommerceGuys\Addressing\Enum\AdministrativeAreaType;
 use CommerceGuys\Addressing\Enum\DependentLocalityType;
 use CommerceGuys\Addressing\Enum\LocalityType;
 use CommerceGuys\Addressing\Enum\PostalCodeType;
-use Drupal\address\AddressFormatInterface;
+use Drupal\address\Entity\AddressFormatInterface;
 
 /**
  * Provides translated labels for the library enums.
@@ -26,7 +26,7 @@ class LabelHelper {
    * term than the field name (Company instead of Organization, Contact name
    * instead of Recipient, etc).
    *
-   * @param \Drupal\address\AddressFormatInterface $addressFormat
+   * @param \Drupal\address\Entity\AddressFormatInterface $addressFormat
    *   The address format.
    *
    * @return string[]
