@@ -188,7 +188,6 @@ class AddressDefaultWidgetTest extends WebTestBase {
     $container = $this->initKernel(\Drupal::request());
     $this->initConfig($container);
     $this->installModulesFromClassProperty($container);
-    $this->restoreBatch();
     $this->rebuildAll();
     // Get available countries and initial values from module's event subscriber.
     $subscriber = \Drupal::service('address_test.event_subscriber');

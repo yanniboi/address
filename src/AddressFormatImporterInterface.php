@@ -8,22 +8,20 @@
 namespace Drupal\address;
 
 /**
- * Defines an address format importer.
- *
- * Imports the address format data provided by the library into config entities.
+ * Imports the library-provided address format data into config entities.
  */
 interface AddressFormatImporterInterface {
 
   /**
-   * Starts a batch process that imports all available data.
+   * Imports all available data.
    */
-  public function startImport();
+  public function importAll();
 
   /**
-   * Imports address formats with the given country codes.
+   * Imports address formats for the given country codes.
    *
    * @param array $countryCodes
-   *   Array of country codes to import address formats for.
+   *   The country codes for which address formats should be imported.
    */
   public function importEntities(array $countryCodes);
 

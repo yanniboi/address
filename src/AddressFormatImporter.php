@@ -12,6 +12,9 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 
+/**
+ * Default implementation of the address format importer.
+ */
 class AddressFormatImporter implements AddressFormatImporterInterface {
 
   /**
@@ -52,63 +55,18 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function startImport() {
-    $operations = [];
-    foreach (array_chunk($this->externalRepository->getAll(), 25, TRUE) as $addressFormats) {
-      $operations[] = [
-        [get_class($this), 'doImportEntities'],
-        [array_keys($addressFormats)],
-      ];
-    }
+  public function importAll() {
+    $addressFormats = $this->externalRepository->getAll();
+    $countryCodes = array_keys($addressFormats);
+    // It's nicer API-wise to just pass the country codes.
+    // The external repository maintains a static cache, so the repeated ->get()
+    // calls have minimal performance impact.
+    $this->importEntities($countryCodes);
+
     if ($this->languageManager->isMultilingual()) {
       $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE);
-      $operations[] = [
-        [get_class($this), 'doImportTranslations'],
-        [array_keys($languages)],
-      ];
+      $this->importTranslations(array_keys($languages));
     }
-
-    batch_set([
-      'title' => t('Importing address formats'),
-      'init_message' => t('Preparing to import...'),
-      'operations' => $operations,
-    ]);
-    // Drush and Simpletest require the batch to be processed manually.
-    if (PHP_SAPI === 'cli' || drupal_valid_test_ua()) {
-      $batch =& batch_get();
-      $batch['progressive'] = FALSE;
-      batch_process();
-    }
-  }
-
-  /**
-   * Batch callback for importing address format entities.
-   *
-   * @param array $countryCodes
-   *   The country codes used to identify address formats.
-   * @param object &$context
-   *   The context of the batch.
-   */
-  public static function doImportEntities(array $countryCodes, &$context) {
-    $importer = \Drupal::service('address.address_format_importer');
-    $importer->importEntities($countryCodes);
-
-    $context['finished'] = 1;
-  }
-
-  /**
-   * Batch callback for importing translations.
-   *
-   * @param array $langcodes
-   *   Language codes used for the translations.
-   * @param object &$context
-   *   The context of the batch.
-   */
-  public static function doImportTranslations(array $langcodes, &$context) {
-    $importer = \Drupal::service('address.address_format_importer');
-    $importer->importTranslations($langcodes);
-
-    $context['finished'] = 1;
   }
 
   /**
