@@ -49,7 +49,7 @@ interface ZoneInterface extends ExternalZoneInterface, ConfigEntityInterface, En
   /**
    * Sets the zone members.
    *
-   * @param \Drupal\address\ZoneMemberInterface[] $members
+   * @param \Drupal\address\Plugin\ZoneMember\ZoneMemberInterface[] $members
    *   The zone members.
    */
   public function setMembers($members);
@@ -57,7 +57,7 @@ interface ZoneInterface extends ExternalZoneInterface, ConfigEntityInterface, En
   /**
    * Adds a zone member.
    *
-   * @param \Drupal\address\ZoneMemberInterface $member
+   * @param \Drupal\address\Plugin\ZoneMember\ZoneMemberInterface $member
    *   The zone member.
    */
   public function addMember(ZoneMemberInterface $member);
@@ -65,7 +65,7 @@ interface ZoneInterface extends ExternalZoneInterface, ConfigEntityInterface, En
   /**
    * Removes a zone member.
    *
-   * @param \Drupal\address\ZoneMemberInterface $member
+   * @param \Drupal\address\Plugin\ZoneMember\ZoneMemberInterface $member
    *   The zone member.
    */
   public function removeMember(ZoneMemberInterface $member);
@@ -73,7 +73,7 @@ interface ZoneInterface extends ExternalZoneInterface, ConfigEntityInterface, En
   /**
    * Checks whether the zone has a zone member.
    *
-   * @param \Drupal\address\ZoneMemberInterface $member
+   * @param \Drupal\address\Plugin\ZoneMember\ZoneMemberInterface $member
    *   The zone member.
    *
    * @return bool TRUE if the zone member was found, FALSE otherwise.

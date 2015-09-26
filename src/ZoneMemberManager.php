@@ -40,7 +40,7 @@ class ZoneMemberManager extends DefaultPluginManager {
    *   The uuid service.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cacheBackend, ModuleHandlerInterface $moduleHandler, UuidInterface $uuidService) {
-    parent::__construct('Plugin/ZoneMember', $namespaces, $moduleHandler, 'Drupal\address\ZoneMemberInterface', 'Drupal\address\Annotation\ZoneMember');
+    parent::__construct('Plugin/ZoneMember', $namespaces, $moduleHandler, 'Drupal\address\Plugin\ZoneMember\ZoneMemberInterface', 'Drupal\address\Annotation\ZoneMember');
 
     $this->alterInfo('zone_member_info');
     $this->setCacheBackend($cacheBackend, 'zone_member_plugins');
