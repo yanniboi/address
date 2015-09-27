@@ -155,7 +155,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
+  public function settingsForm(array $form, FormStateInterface $formState) {
     $countryList = $this->countryRepository->getList();
 
     $element = [];
@@ -301,7 +301,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
+  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $formState) {
     return NestedArray::getValue($element, $violation->arrayPropertyPath);
   }
 
