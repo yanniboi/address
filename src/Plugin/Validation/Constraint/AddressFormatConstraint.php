@@ -21,9 +21,9 @@ use Symfony\Component\Validator\Constraint;
 class AddressFormatConstraint extends Constraint {
 
   public $fields;
-  public $blankMessage = 'This value should be blank';
-  public $notBlankMessage = 'This value should not be blank';
-  public $invalidMessage = 'This value is invalid.';
+  public $blankMessage = '!name field must be blank.';
+  public $notBlankMessage = '!name field is required.';
+  public $invalidMessage = '!name field is not in the right format.';
 
   /**
    * {@inheritDoc}

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraint;
 class CountryConstraint extends Constraint {
 
   public $availableCountries = [];
-  public $invalidMessage = 'This value is not a valid country.';
-  public $notAvailableMessage = 'This value is not an available country.';
+  public $invalidMessage = 'The country %value is not valid.';
+  public $notAvailableMessage = 'The country %value is not available.';
 
 }
