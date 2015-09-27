@@ -264,6 +264,9 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         ['Drupal\Core\Render\Element\Details', 'preRenderGroup'],
         [get_class($this), 'groupElements'],
       ],
+      '#after_build' => [
+        [get_class($this), 'clearValues'],
+      ],
       '#attached' => [
         'library' => ['address/form'],
       ],
@@ -278,9 +281,6 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       '#required' => $element['#required'],
       '#empty_value' => '',
       '#limit_validation_errors' => [],
-      '#element_validate' => [
-        [get_class($this), 'clearValues'],
-      ],
       '#ajax' => [
         'callback' => [get_class($this), 'ajaxRefresh'],
         'wrapper' => $wrapperId,
@@ -462,23 +462,33 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   }
 
   /**
-   * Clears the country-specific form state values when a country changes.
+   * Clears the country-specific form values when the country changes.
+   *
+   * Implemented as an #after_build callback because #after_build runs before
+   * validation, allowing the values to be cleared early enough to prevent the
+   * "Illegal choice" error.
    */
   public static function clearValues(array $element, FormStateInterface $formState) {
-    if ($element['#default_value'] != $element['#value']) {
-      $elementParents = $element['#parents'];
-      array_pop($elementParents);
+    $triggeringElement = $formState->getTriggeringElement();
+    if (!$triggeringElement) {
+      return $element;
+    }
 
+    $triggeringElementName = end($triggeringElement['#parents']);
+    if ($triggeringElementName == 'country_code') {
       $keys = [
         'dependent_locality', 'locality', 'administrative_area',
         'postal_code', 'sorting_code',
       ];
       $input = &$formState->getUserInput();
       foreach ($keys as $key) {
-        $parents = array_merge($elementParents, [$key]);
+        $parents = array_merge($element['#parents'], [$key]);
         NestedArray::setValue($input, $parents, '');
+        $element[$key]['#value'] = '';
       }
     }
+
+    return $element;
   }
 
 }
