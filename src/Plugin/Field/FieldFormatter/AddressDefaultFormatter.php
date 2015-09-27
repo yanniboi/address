@@ -111,7 +111,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
+  public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
     foreach ($items as $delta => $item) {
       $elements[$delta] = [
@@ -126,7 +126,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
           ],
         ],
       ];
-      $elements[$delta] += $this->viewElement($item);
+      $elements[$delta] += $this->viewElement($item, $langcode);
     }
 
     return $elements;
@@ -137,11 +137,13 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *
    * @param \Drupal\address\AddressInterface $address
    *   The address.
+   * @param string $langcode
+   *   The language that should be used to render the field.
    *
    * @return array
    *   A renderable array.
    */
-  protected function viewElement(AddressInterface $address) {
+  protected function viewElement(AddressInterface $address, $langcode) {
     $countryCode = $address->getCountryCode();
     $countries = $this->countryRepository->getList();
     $addressFormat = $this->addressFormatRepository->get($countryCode, $address->getLocale());
