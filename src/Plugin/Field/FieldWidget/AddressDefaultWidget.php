@@ -27,6 +27,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Plugin implementation of the 'address' widget.
@@ -295,6 +296,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     }
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
+    return NestedArray::getValue($element, $violation->arrayPropertyPath);
   }
 
   /**
