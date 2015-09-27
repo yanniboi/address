@@ -615,6 +615,72 @@ class AddressDefaultWidgetTest extends WebTestBase {
   }
 
   /**
+   * Test that changing the country clears the expected values.
+   */
+  function testClearValues() {
+    $fieldName = $this->fieldInstance->getName();
+     // Set the default country to US.
+    $this->formDisplay->setComponent($fieldName, [
+      'type' => 'address_default',
+      'settings' => [
+        'default_country' => 'US',
+      ],
+    ])->save();
+    // Make the field required.
+    $edit = [];
+    $edit['required'] = TRUE;
+    $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
+
+    // Create an article with all fields filled.
+    $edit = [];
+    $edit[$fieldName .'[0][country_code]'] = 'US';
+    $edit[$fieldName .'[0][recipient]'] = 'Some Recipient';
+    $edit[$fieldName .'[0][organization]'] = 'Some Organization';
+    $edit[$fieldName .'[0][address_line1]'] = '1098 Alta Ave';
+    $edit[$fieldName .'[0][address_line2]'] = 'Street 2';
+    $edit[$fieldName .'[0][locality]'] = 'Mountain View';
+    $edit[$fieldName .'[0][administrative_area]'] = 'US-CA';
+    $edit[$fieldName .'[0][postal_code]'] = '94043';
+    $this->drupalPostAjaxForm($this->formContentAddUrl, $edit, $fieldName .'[0][country_code]');
+    $this->assertResponse(200);
+    $edit['title[0][value]'] = $this->randomMachineName(8);;
+    $this->drupalPostForm(NULL, $edit, t('Save'));
+    $this->assertResponse(200);
+    // Check that the article has been created.
+    $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
+    $this->assertTrue($node, 'Created article '. $edit['title[0][value]']);
+
+    $this->drupalGet('node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][country_code]', 'US', 'Country code set to US in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][administrative_area]', 'US-CA', 'Field administrative_area set to US-CA in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][locality]', '', 'Field locality set to Moutain View in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][postal_code]', '', 'Field postal_code set to 94043 in form node/'. $node->id() .'/edit');
+
+    // Now change the country to China, subdivision fields should be cleared.
+    $edit = [];
+    $edit[$fieldName .'[0][country_code]'] = 'CN';
+    $this->drupalPostAjaxForm('node/'. $node->id() .'/edit', $edit, $fieldName .'[0][country_code]');
+    $this->assertResponse(200);
+    // Check that values are cleared.
+    $this->assertFieldByName($fieldName .'[0][country_code]', 'CN', 'Country code changed to CN in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][administrative_area]', '', 'Field administrative_area is cleared in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][locality]', '', 'Field locality is cleared in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][dependent_locality]', '', 'Field dependent_locality is cleared in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][postal_code]', '', 'Field postal_code is cleared in form node/'. $node->id() .'/edit');
+
+    // Test the same with France.
+    $edit = [];
+    $edit[$fieldName .'[0][country_code]'] = 'FR';
+    $this->drupalPostAjaxForm(NULL, $edit, $fieldName .'[0][country_code]');
+    $this->assertResponse(200);
+    // Check that values are cleared.
+    $this->assertFieldByName($fieldName .'[0][country_code]', 'FR', 'Country code changed to FR in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][locality]', '', 'Field locality is cleared in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][postal_code]', '', 'Field postal_code is cleared in form node/'. $node->id() .'/edit');
+    $this->assertFieldByName($fieldName .'[0][sorting_code]', '', 'Field sorting_code is cleared in form node/'. $node->id() .'/edit');
+  }
+
+  /**
    * Asserts that the passed field values are correct.
    *
    * Ignores differences in ordering.
