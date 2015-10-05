@@ -111,12 +111,12 @@ class DefaultFormatterTest extends KernelTestBase {
     $this->renderEntityFields($entity, $this->display);
     // Andorra has no predefined administrative areas, but it does have
     // predefined localities, which must be shown.
-    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
-      '!line1' => '<p translate="no">',
-      '!line2' => '<span class="address-line1">C. Prat de la Creu, 62-64</span><br>' . "\n",
-      '!line3' => '<span class="postal-code">AD500</span> <span class="locality">Parròquia d&#039;Andorra la Vella</span><br>' . "\n",
-      '!line4' => '<span class="country">Andorra</span>',
-      '!line5' => '</p>',
+    $expected = implode('', [
+      'line1' => '<p translate="no">',
+      'line2' => '<span class="address-line1">C. Prat de la Creu, 62-64</span><br>' . "\n",
+      'line3' => '<span class="postal-code">AD500</span> <span class="locality">Parròquia d&#039;Andorra la Vella</span><br>' . "\n",
+      'line4' => '<span class="country">Andorra</span>',
+      'line5' => '</p>',
     ]);
     $this->assertRaw($expected, 'The AD address has been properly formatted.');
   }
@@ -133,25 +133,25 @@ class DefaultFormatterTest extends KernelTestBase {
       'address_line1' => 'Some Street 12',
     ];
     $this->renderEntityFields($entity, $this->display);
-    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5!line6', [
-      '!line1' => '<p translate="no">',
-      '!line2' => '<span class="address-line1">Some Street 12</span><br>' . "\n",
-      '!line3' => '<span class="locality">Ahuachapán</span><br>' . "\n",
-      '!line4' => '<span class="administrative-area">Ahuachapán</span><br>' . "\n",
-      '!line5' => '<span class="country">El Salvador</span>',
-      '!line6' => '</p>',
+    $expected = implode('', [
+      'line1' => '<p translate="no">',
+      'line2' => '<span class="address-line1">Some Street 12</span><br>' . "\n",
+      'line3' => '<span class="locality">Ahuachapán</span><br>' . "\n",
+      'line4' => '<span class="administrative-area">Ahuachapán</span><br>' . "\n",
+      'line5' => '<span class="country">El Salvador</span>',
+      'line6' => '</p>',
     ]);
     $this->assertRaw($expected, 'The SV address has been properly formatted.');
 
     $entity->{$this->fieldName}->postal_code = 'CP 2101';
     $this->renderEntityFields($entity, $this->display);
-    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5!line6', [
-      '!line1' => '<p translate="no">',
-      '!line2' => '<span class="address-line1">Some Street 12</span><br>' . "\n",
-      '!line3' => '<span class="postal-code">CP 2101</span>-<span class="locality">Ahuachapán</span><br>' . "\n",
-      '!line4' => '<span class="administrative-area">Ahuachapán</span><br>' . "\n",
-      '!line5' => '<span class="country">El Salvador</span>',
-      '!line6' => '</p>',
+    $expected = implode('', [
+      'line1' => '<p translate="no">',
+      'line2' => '<span class="address-line1">Some Street 12</span><br>' . "\n",
+      'line3' => '<span class="postal-code">CP 2101</span>-<span class="locality">Ahuachapán</span><br>' . "\n",
+      'line4' => '<span class="administrative-area">Ahuachapán</span><br>' . "\n",
+      'line5' => '<span class="country">El Salvador</span>',
+      'line6' => '</p>',
     ]);
     $this->assertRaw($expected, 'The SV address has been properly formatted.');
   }
@@ -176,15 +176,15 @@ class DefaultFormatterTest extends KernelTestBase {
       'recipient' => 'Mr. Liu',
     ];
     $this->renderEntityFields($translation, $this->display);
-    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5!line6!line7!line8', [
-      '!line1' => '<p translate="no">',
-      '!line2' => '<span class="country">台灣</span><br>' . "\n",
-      '!line3' => '<span class="postal-code">106</span><br>' . "\n",
-      '!line4' => '<span class="administrative-area">台北市</span><span class="locality">大安區</span><br>' . "\n",
-      '!line5' => '<span class="address-line1">Sec. 3 Hsin-yi Rd.</span><br>' . "\n",
-      '!line6' => '<span class="organization">Giant &lt;h2&gt;Bike&lt;/h2&gt; Store</span><br>' . "\n",
-      '!line7' => '<span class="recipient">Mr. Liu</span>',
-      '!line8' => '</p>',
+    $expected = implode('', [
+      'line1' => '<p translate="no">',
+      'line2' => '<span class="country">台灣</span><br>' . "\n",
+      'line3' => '<span class="postal-code">106</span><br>' . "\n",
+      'line4' => '<span class="administrative-area">台北市</span><span class="locality">大安區</span><br>' . "\n",
+      'line5' => '<span class="address-line1">Sec. 3 Hsin-yi Rd.</span><br>' . "\n",
+      'line6' => '<span class="organization">Giant &lt;h2&gt;Bike&lt;/h2&gt; Store</span><br>' . "\n",
+      'line7' => '<span class="recipient">Mr. Liu</span>',
+      'line8' => '</p>',
     ]);
     $this->assertRaw($expected, 'The TW address has been properly formatted.');
   }
@@ -201,12 +201,12 @@ class DefaultFormatterTest extends KernelTestBase {
       'postal_code' => '94043',
     ];
     $this->renderEntityFields($entity, $this->display);
-    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
-      '!line1' => '<p translate="no">',
-      '!line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
-      '!line3' => '<span class="administrative-area">CA</span> <span class="postal-code">94043</span><br>' . "\n",
-      '!line4' => '<span class="country">United States</span>',
-      '!line5' => '</p>',
+    $expected = implode('', [
+      'line1' => '<p translate="no">',
+      'line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
+      'line3' => '<span class="administrative-area">CA</span> <span class="postal-code">94043</span><br>' . "\n",
+      'line4' => '<span class="country">United States</span>',
+      'line5' => '</p>',
     ]);
     $this->assertRaw($expected, 'The US address has been properly formatted.');
 
@@ -214,12 +214,12 @@ class DefaultFormatterTest extends KernelTestBase {
     $entity->{$this->fieldName}->locality = 'Mountain View';
     $entity->{$this->fieldName}->administrative_area = '';
     $this->renderEntityFields($entity, $this->display);
-    $expected = SafeMarkup::format('!line1!line2!line3!line4!line5', [
-      '!line1' => '<p translate="no">',
-      '!line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
-      '!line3' => '<span class="locality">Mountain View</span>, <span class="postal-code">94043</span><br>' . "\n",
-      '!line4' => '<span class="country">United States</span>',
-      '!line5' => '</p>',
+    $expected = implode('', [
+      'line1' => '<p translate="no">',
+      'line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
+      'line3' => '<span class="locality">Mountain View</span>, <span class="postal-code">94043</span><br>' . "\n",
+      'line4' => '<span class="country">United States</span>',
+      'line5' => '</p>',
     ]);
     $this->assertRaw($expected, 'The US address has been properly formatted.');
   }
