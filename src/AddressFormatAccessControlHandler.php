@@ -22,7 +22,7 @@ class AddressFormatAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     // ZZ is the fallback address format and it must always be present.
     if (($operation == 'delete') && ($entity->id() == 'ZZ')) {
       return AccessResult::forbidden();
