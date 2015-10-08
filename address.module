@@ -27,5 +27,8 @@ function address_configurable_language_insert(ConfigurableLanguage $language) {
  * hide this functionality and implement our own via custom widget settings.
  */
 function address_form_field_config_edit_form_alter(&$form, FormStateInterface $form_state) {
-  $form['default_value']['#access'] = FALSE;
+  $field = $form_state->getFormObject()->getEntity();
+  if ($field->getType() == 'address') {
+    $form['default_value']['#access'] = FALSE;
+  }
 }
