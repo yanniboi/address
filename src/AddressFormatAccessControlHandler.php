@@ -28,7 +28,7 @@ class AddressFormatAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::forbidden();
     }
     else {
-      return parent::checkAccess($entity, $operation, $langcode, $account);
+      return parent::checkAccess($entity, $operation, $account);
     }
   }
 
