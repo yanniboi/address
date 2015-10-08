@@ -35,8 +35,6 @@ function address_field_views_data(FieldStorageConfigInterface $field) {
     foreach ($columns as $column => $plugin_id) {
       $data[$table_name][$field_name . '_' . $column]['field'] = [
         'id' => $plugin_id,
-        'field_name' => $table_data[$field_name]['field']['field_name'],
-        'entity_type' => $table_data[$field_name]['field']['entity_type'],
       ];
     }
   }
