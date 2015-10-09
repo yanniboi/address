@@ -192,14 +192,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
     $initialValues = $subscriber->getInitialValues();
     // Access the content add form and test the list of countries.
     $this->drupalGet($this->formContentAddUrl);
-    $options = [];
-    $elements = $this->xpath('//select[@name="' . $fieldName . '[0][country_code]"]/option/@value');
-    foreach ($elements as $key => $element) {
-      if ($option = $element->__toString()) {
-        $options[] = $option;
-      }
-    }
-    $this->assertFieldValues($options, $availableCountries, 'Available countries set in the available countries event subscriber and present in the widget: ' . implode(', ', $options));
+    $this->assertOptions($fieldName . '[0][country_code]', $availableCountries, 'Available countries set in the event subscriber are present in the widget.');
     // Test the values of the fields.
     foreach ($initialValues as $key => $value) {
       if ($value) {
@@ -215,20 +208,11 @@ class AddressDefaultWidgetTest extends WebTestBase {
    */
   function testAvailableCountries() {
     $fieldName = $this->fieldInstance->getName();
-    $edit = [];
-
     // Initially, there are no available countries selected.
     // All countries from country repository should be present in the form.
     $countries = array_keys($this->countryRepository->getList());
     $this->drupalGet($this->formContentAddUrl);
-    $options = [];
-    $elements = $this->xpath('//select[@name="' . $fieldName . '[0][country_code]"]/option/@value');
-    foreach ($elements as $key => $element) {
-      if ($option = $element->__toString()) {
-        $options[] = $option;
-      }
-    }
-    $this->assertFieldValues($options, $countries, 'All countries from country repository are present in the widget.');
+    $this->assertOptions($fieldName . '[0][country_code]', $countries, 'All countries are present.');
 
     // Now select some countries as available.
     $countries = ['US', 'FR', 'BR', 'JP'];
@@ -237,24 +221,8 @@ class AddressDefaultWidgetTest extends WebTestBase {
     }, $countries);
     $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
     $this->assertResponse(200);
-    $this->drupalGet($this->formFieldConfigUrl);
-    $options = [];
-    $elements = $this->xpath('//select[@name="settings[available_countries][]"]/option[boolean(@selected)]/@value');
-    foreach ($elements as $key => $element) {
-      if ($option = $element->__toString()) {
-        $options[] = $option;
-      }
-    }
-    $this->assertFieldValues($options, $countries, 'Available countries set to ' . implode(', ', $countries));
     $this->drupalGet($this->formContentAddUrl);
-    $options = [];
-    $elements = $this->xpath('//select[@name="' . $fieldName . '[0][country_code]"]/option/@value');
-    foreach ($elements as $key => $element) {
-      if ($option = $element->__toString()) {
-        $options[] = $option;
-      }
-    }
-    $this->assertFieldValues($options, $countries, 'Available countries present in the widget: ' . implode(', ', $countries));
+    $this->assertOptions($fieldName . '[0][country_code]', $countries, 'The restricted list of available countries is present.');
   }
 
   /**
@@ -681,6 +649,33 @@ class AddressDefaultWidgetTest extends WebTestBase {
     $this->assertFieldByName($fieldName . '[0][locality]', '', 'Field locality is cleared in form node/' . $node->id() . '/edit');
     $this->assertFieldByName($fieldName . '[0][postal_code]', '', 'Field postal_code is cleared in form node/' . $node->id() . '/edit');
     $this->assertFieldByName($fieldName . '[0][sorting_code]', '', 'Field sorting_code is cleared in form node/' . $node->id() . '/edit');
+  }
+
+  /**
+   * Asserts that a select field has all of the provided options.
+   *
+   * Core only has assertOption(), this helper decreases the number of needed
+   * assertions.
+   *
+   * @param string $id
+   *   ID of select field to assert.
+   * @param array $options
+   *   Options to assert.
+   * @param string $message
+   *   (optional) A message to display with the assertion. Do not translate
+   *   messages: use \Drupal\Component\Utility\SafeMarkup::format() to embed
+   *   variables in the message text, not t(). If left blank, a default message
+   *   will be displayed.
+   */
+  protected function assertOptions($id, $options, $message) {
+    $elements = $this->xpath('//select[@name="' . $id . '"]/option/@value');
+    $foundOptions = [];
+    foreach ($elements as $key => $element) {
+      if ($option = $element->__toString()) {
+        $foundOptions[] = $option;
+      }
+    }
+    $this->assertFieldValues($foundOptions, $options, $message);
   }
 
   /**
