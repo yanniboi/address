@@ -7,8 +7,10 @@
 
 namespace Drupal\address\Plugin\views\field;
 
+use CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Displays the subdivision name instead of the id.
@@ -18,6 +20,43 @@ use Drupal\views\ResultRow;
  * @ViewsField("subdivision")
  */
 class Subdivision extends FieldPluginBase {
+
+  /**
+   * The subdivision repository.
+   *
+   * @var \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface
+   */
+  protected $subdivisionRepository;
+
+  /**
+   * Constructs a Subdivision object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $pluginId
+   *   The id of the plugin instance.
+   * @param mixed $pluginDefinition
+   *   The plugin implementation definition.
+   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
+   *   The subdivision repository.
+   */
+  public function __construct(array $configuration, $pluginId, $pluginDefinition, SubdivisionRepositoryInterface $subdivisionRepository) {
+    parent::__construct($configuration, $pluginId, $pluginDefinition);
+
+    $this->subdivisionRepository = $subdivisionRepository;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+    return new static(
+      $configuration,
+      $pluginId,
+      $pluginDefinition,
+      $container->get('address.subdivision_repository')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -45,9 +84,8 @@ class Subdivision extends FieldPluginBase {
         break;
     }
 
-    $subdivisionRepository = \Drupal::service('address.subdivision_repository');
     if (!$needsParent || !empty($parentId)) {
-      $subdivisions = $subdivisionRepository->getList($address->country_code, $parentId);
+      $subdivisions = $this->subdivisionRepository->getList($address->country_code, $parentId);
       if ($subdivisions[$value]) {
         $value = $subdivisions[$value];
       }
