@@ -17,10 +17,10 @@ use Drupal\field\FieldStorageConfigInterface;
 function address_field_views_data(FieldStorageConfigInterface $field) {
   // Provide a field handler for each individual column.
   $columns = [
-    'country_code' => 'standard',
-    'administrative_area' => 'standard',
-    'locality' => 'standard',
-    'dependent_locality' => 'standard',
+    'country_code' => 'country_code',
+    'administrative_area' => 'subdivision',
+    'locality' => 'subdivision',
+    'dependent_locality' => 'subdivision',
     'postal_code' => 'standard',
     'sorting_code' => 'standard',
     'address_line1' => 'standard',
@@ -35,6 +35,8 @@ function address_field_views_data(FieldStorageConfigInterface $field) {
     foreach ($columns as $column => $plugin_id) {
       $data[$table_name][$field_name . '_' . $column]['field'] = [
         'id' => $plugin_id,
+        'field_name' => $field_name,
+        'property' => $column,
       ];
     }
   }
