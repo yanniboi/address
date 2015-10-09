@@ -184,19 +184,17 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The initial values, keyed by property.
    */
   protected function getInitialValues(array $countryList) {
-    $defaultCountry = '';
-    if ($this->fieldDefinition->isRequired()) {
-      $defaultCountry = $this->getSetting('default_country');
-      // Resolve the special site_default option.
-      if ($defaultCountry == 'site_default') {
-        $defaultCountry = $this->configFactory->get('system.date')->get('country.default');
-      }
-      // Fallback to the first country in the list if the default country is not
-      // available, or is empty even though the field is required.
-      $notAvailable = $defaultCountry && !isset($countryList[$defaultCountry]);
-      if ($notAvailable || empty($defaultCountry)) {
-        $defaultCountry = key($countryList);
-      }
+    $defaultCountry = $this->getSetting('default_country');
+    // Resolve the special site_default option.
+    if ($defaultCountry == 'site_default') {
+      $defaultCountry = $this->configFactory->get('system.date')->get('country.default');
+    }
+    // Fallback to the first country in the list if the default country is not
+    // available, or is empty even though the field is required.
+    $notAvailable = $defaultCountry && !isset($countryList[$defaultCountry]);
+    $emptyButRequired = empty($defaultCountry) && $this->fieldDefinition->isRequired();
+    if ($notAvailable || $emptyButRequired) {
+      $defaultCountry = key($countryList);
     }
 
     $initialValues = [
