@@ -46,7 +46,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    *
    * @var Drupal\Field\FieldConfigInterface
    */
-  protected $fieldInstance;
+  protected $field;
 
   /**
    * Entity form display.
@@ -106,19 +106,19 @@ class AddressDefaultWidgetTest extends WebTestBase {
     $this->drupalLogin($this->adminUser);
 
     // Add the address field to the article content type.
-    $field_storage = FieldStorageConfig::create([
+    $fieldStorage = FieldStorageConfig::create([
       'field_name' => 'field_address',
       'entity_type' => 'node',
       'type' => 'address',
     ]);
-    $field_storage->save();
+    $fieldStorage->save();
 
-    $this->fieldInstance = FieldConfig::create([
-      'field_storage' => $field_storage,
+    $this->field = FieldConfig::create([
+      'field_storage' => $fieldStorage,
       'bundle' => 'article',
       'label' => 'Address',
     ]);
-    $this->fieldInstance->save();
+    $this->field->save();
 
     // Set article's form display.
     $this->formDisplay = EntityFormDisplay::load('node.article.default');
@@ -131,13 +131,13 @@ class AddressDefaultWidgetTest extends WebTestBase {
       ])->save();
     }
     $this->formDisplay
-      ->setComponent($this->fieldInstance->getName(), [
+      ->setComponent($this->field->getName(), [
         'type' => 'address_default',
         'settings' => [],
       ])->save();
 
     $this->formContentAddUrl = 'node/add/article';
-    $this->formFieldConfigUrl = 'admin/structure/types/manage/article/fields/node.article.' . $this->fieldInstance->getName();
+    $this->formFieldConfigUrl = 'admin/structure/types/manage/article/fields/node.article.' . $this->field->getName();
 
     $this->countryRepository = \Drupal::service('address.country_repository');
     $this->subdivisionRepository = \Drupal::service('address.subdivision_repository');
@@ -154,7 +154,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test widget's initial values, default country and alter events.
    */
   function testInitialValues() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     $edit = [];
 
     // Set default country to US.
@@ -172,8 +172,8 @@ class AddressDefaultWidgetTest extends WebTestBase {
     $this->assertOptionSelected('edit-field-address-0-country-code', 'US', 'The configured default_country is selected.');
 
     // Required field: Country should be required and set to default_country.
-    $this->fieldInstance->setRequired(TRUE);
-    $this->fieldInstance->save();
+    $this->field->setRequired(TRUE);
+    $this->field->save();
     $this->drupalGet($this->formContentAddUrl);
     $this->assertTrue((bool) $this->xpath('//select[@name="' . $fieldName . '[0][country_code]" and boolean(@required)]'), 'Country is shown as required.');
     $this->assertOptionSelected('edit-field-address-0-country-code', 'US', 'The configured default_country is selected.');
@@ -207,7 +207,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test available countries.
    */
   function testAvailableCountries() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     // Initially, there are no available countries selected.
     // All countries from country repository should be present in the form.
     $countries = array_keys($this->countryRepository->getList());
@@ -229,7 +229,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test item with a country that's no longer available.
    */
   function testUnavailableCountry() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     $address = [];
     $edit = [];
 
@@ -323,7 +323,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test presence of expected fields for a country.
    */
   function testExpectedFields() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     // Prepare an array for easier manipulation.
     // Keys are field names from the field instance.
     // Values are corresponding field names from add article form.
@@ -389,7 +389,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test absence of fields disabled in the address settings.
    */
   function testDisabledFields() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     // Prepare an array for easier manipulation.
     // Keys are field names from the field instance.
     // Values are corresponding field names from add article form.
@@ -496,7 +496,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test presence of subdivision dropdowns where expected.
    */
   function testSubdivision() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     $edit = [];
 
     // Set address field required, 'default_country' setting should be set in article add form.
@@ -589,7 +589,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
    * Test that changing the country clears the expected values.
    */
   function testClearValues() {
-    $fieldName = $this->fieldInstance->getName();
+    $fieldName = $this->field->getName();
     // Set the default country to US.
     $this->formDisplay->setComponent($fieldName, [
       'type' => 'address_default',

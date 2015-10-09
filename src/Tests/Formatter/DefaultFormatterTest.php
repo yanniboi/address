@@ -74,19 +74,19 @@ class DefaultFormatterTest extends KernelTestBase {
     $this->bundle = $this->entityType;
     $this->fieldName = Unicode::strtolower($this->randomMachineName());
 
-    $field_storage = FieldStorageConfig::create([
+    $fieldStorage = FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'entity_type' => $this->entityType,
       'type' => 'address',
     ]);
-    $field_storage->save();
+    $fieldStorage->save();
 
-    $instance = FieldConfig::create([
-      'field_storage' => $field_storage,
+    $field = FieldConfig::create([
+      'field_storage' => $fieldStorage,
       'bundle' => $this->bundle,
       'label' => $this->randomMachineName(),
     ]);
-    $instance->save();
+    $field->save();
 
     $this->display = entity_get_display($this->entityType, $this->bundle, 'default');
     $this->display->setComponent($this->fieldName, [
