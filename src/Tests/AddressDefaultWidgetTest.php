@@ -166,20 +166,17 @@ class AddressDefaultWidgetTest extends WebTestBase {
         ],
       ])->save();
 
-    // Set address field optional, 'None' should be set in article add form.
-    $edit['required'] = FALSE;
-    $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
-    $this->assertResponse(200);
+    // Optional field: Country should be optional and set to default_country.
     $this->drupalGet($this->formContentAddUrl);
-    $this->assertOptionSelected('edit-field-address-0-country-code', '', 'Option None for field edit-field-address-0-country-code is selected.');
+    $this->assertFalse((bool) $this->xpath('//select[@name="' . $fieldName . '[0][country_code]" and boolean(@required)]'), 'Country is shown as optional.');
+    $this->assertOptionSelected('edit-field-address-0-country-code', 'US', 'The configured default_country is selected.');
 
-    // Set address field required, 'default_country' setting should be set in article add form.
-    $edit['required'] = TRUE;
-    $this->drupalPostForm($this->formFieldConfigUrl, $edit, t('Save settings'));
-    $this->assertResponse(200);
+    // Required field: Country should be required and set to default_country.
+    $this->fieldInstance->setRequired(TRUE);
+    $this->fieldInstance->save();
     $this->drupalGet($this->formContentAddUrl);
-    $this->assertOptionSelected('edit-field-address-0-country-code', 'US');
-    $this->assertTrue((bool) $this->xpath('//select[@name="' . $fieldName . '[0][country_code]" and boolean(@required)]'), 'Country code field is required on form ' . $this->formContentAddUrl);
+    $this->assertTrue((bool) $this->xpath('//select[@name="' . $fieldName . '[0][country_code]" and boolean(@required)]'), 'Country is shown as required.');
+    $this->assertOptionSelected('edit-field-address-0-country-code', 'US', 'The configured default_country is selected.');
 
     // Test address events.
     // The address_test module is installed here, not in setUp().
