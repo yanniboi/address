@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ZoneForm extends EntityForm {
@@ -114,9 +115,8 @@ class ZoneForm extends EntityForm {
         '#type' => 'markup',
         '#markup' => $member->getPluginDefinition()['name'],
       ];
-      $memberValues = $formState->getValue(['members', $index, 'form'], []);
-      $memberFormState = new FormState();
-      $memberFormState->setValues($memberValues);
+      $memberParents = ['members', $index, 'form'];
+      $memberFormState = $this->buildMemberFormState($memberParents, $formState);
       $memberForm['form'] = $member->buildConfigurationForm([], $memberFormState);
       $memberForm['form']['#element_validate'] = ['::memberFormValidate'];
 
@@ -227,8 +227,7 @@ class ZoneForm extends EntityForm {
    */
   public function memberFormValidate($memberForm, FormStateInterface $formState) {
     $member = $memberForm['#member'];
-    $memberFormState = new FormState();
-    $memberFormState->setValues($formState->getValue($memberForm['#parents'], []));
+    $memberFormState = $this->buildMemberFormState($memberForm['#parents'], $formState);
     $member->validateConfigurationForm($memberForm, $memberFormState);
     // Update form state with values that might have been changed by the plugin.
     $formState->setValue($memberForm['#parents'], $memberFormState->getValues());
@@ -243,8 +242,7 @@ class ZoneForm extends EntityForm {
     foreach ($formState->getValue(['members']) as $memberIndex => $values) {
       $memberForm = $form['members'][$memberIndex]['form'];
       $member = $memberForm['#member'];
-      $memberFormState = new FormState();
-      $memberFormState->setValues($formState->getValue($memberForm['#parents'], []));
+      $memberFormState = $this->buildMemberFormState($memberForm['#parents'], $formState);
       $member->submitConfigurationForm($memberForm, $memberFormState);
       // Update form state with values that might have been changed by the plugin.
       $formState->setValue($memberForm['#parents'], $memberFormState->getValues());
@@ -266,6 +264,27 @@ class ZoneForm extends EntityForm {
       '%label' => $this->entity->label(),
     ]));
     $formState->setRedirect('entity.zone.collection');
+  }
+
+  /**
+   * Builds the form state passed to zone members.
+   *
+   * @param array $memberParents
+   *   The parents array indicating the position of the member form.
+   * @param \Drupal\Core\Form\FormStateInterface $formState
+   *   The parent form state.
+   *
+   * @return \Drupal\Core\Form\FormStateInterface
+   *   The new member form state.
+   */
+  protected function buildMemberFormState($memberParents, FormStateInterface $formState) {
+    $memberValues = $formState->getValue($memberParents, []);
+    $memberUserInput = (array) NestedArray::getValue($formState->getUserInput(), $memberParents);
+    $memberFormState = new FormState();
+    $memberFormState->setValues($memberValues);
+    $memberFormState->setUserInput($memberUserInput);
+
+    return $memberFormState;
   }
 
 }
