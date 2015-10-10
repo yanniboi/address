@@ -114,10 +114,10 @@ class ZoneForm extends EntityForm {
         '#type' => 'markup',
         '#markup' => $member->getPluginDefinition()['name'],
       ];
-      $memberValues = $formState->getValue(['members', $index], []);
+      $memberValues = $formState->getValue(['members', $index, 'form'], []);
       $memberFormState = new FormState();
       $memberFormState->setValues($memberValues);
-      $memberForm['form'] = $member->buildConfigurationForm([], $formState);
+      $memberForm['form'] = $member->buildConfigurationForm([], $memberFormState);
       $memberForm['form']['#element_validate'] = ['::memberFormValidate'];
 
       $memberForm['weight'] = [
