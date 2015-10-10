@@ -15,4 +15,12 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
  * Defines the interface for zone members.
  */
 interface ZoneMemberInterface extends ExternalZoneMemberInterface, ConfigurablePluginInterface, PluginFormInterface {
+
+  /**
+   * Gets the zone member weight.
+   *
+   * @return string The zone member weight.
+   */
+  public function getWeight();
+
 }

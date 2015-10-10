@@ -47,6 +47,7 @@ class ZoneForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $formState) {
     $zone = $this->entity;
+    $userInput = $formState->getUserInput();
 
     $form['#tree'] = TRUE;
     $form['name'] = [
@@ -88,9 +89,16 @@ class ZoneForm extends EntityForm {
       '#header' => [
         $this->t('Type'),
         $this->t('Zone member'),
+        $this->t('Weight'),
         $this->t('Operations'),
       ],
-      '#empty' => t('There are currently no zone members in this zone. Add one by selecting an option below.'),
+      '#tabledrag' => [
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'zone-member-order-weight',
+        ],
+      ],
       '#weight' => 5,
       '#prefix' => '<div id="' . $wrapperId . '">',
       '#suffix' => '</div>',
@@ -99,6 +107,9 @@ class ZoneForm extends EntityForm {
     $index = 0;
     foreach ($this->entity->getMembers() as $key => $member) {
       $memberForm = &$form['members'][$index];
+      $memberForm['#attributes']['class'][] = 'draggable';
+      $memberForm['#weight'] = isset($userInput['members'][$index]) ? $userInput['members'][$index]['weight'] : NULL;
+
       $memberForm['type'] = [
         '#type' => 'markup',
         '#markup' => $member->getPluginDefinition()['name'],
@@ -108,6 +119,16 @@ class ZoneForm extends EntityForm {
       $memberFormState->setValues($memberValues);
       $memberForm['form'] = $member->buildConfigurationForm([], $formState);
       $memberForm['form']['#element_validate'] = ['::memberFormValidate'];
+
+      $memberForm['weight'] = [
+        '#type' => 'weight',
+        '#title' => $this->t('Weight for @title', ['@title' => $member->getName()]),
+        '#title_display' => 'invisible',
+        '#default_value' => $member->getWeight(),
+        '#attributes' => [
+          'class' => ['zone-member-order-weight'],
+        ],
+      ];
       $memberForm['remove'] = [
         '#type' => 'submit',
         '#name' => 'remove_member' . $index,
@@ -123,6 +144,9 @@ class ZoneForm extends EntityForm {
 
       $index++;
     }
+
+    // Sort the members by weight. Ensures weight is preserved on ajax refresh.
+    uasort($form['members'], ['\Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
 
     $plugins = [];
     foreach ($this->memberManager->getDefinitions() as $plugin => $definition) {
@@ -224,8 +248,12 @@ class ZoneForm extends EntityForm {
       $member->submitConfigurationForm($memberForm, $memberFormState);
       // Update form state with values that might have been changed by the plugin.
       $formState->setValue($memberForm['#parents'], $memberFormState->getValues());
+      // Update the member weight.
+      $configuration = $member->getConfiguration();
+      $configuration['weight'] = $values['weight'];
+      $member->setConfiguration($configuration);
       // Update the member on the entity.
-      $this->entity->getMembers()->addInstanceId($member->getId(), $member->getConfiguration());
+      $this->entity->getMembers()->addInstanceId($member->getId(), $configuration);
     }
   }
 

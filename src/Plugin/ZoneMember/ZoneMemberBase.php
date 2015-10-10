@@ -57,6 +57,7 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
     return [
       'id' => '',
       'name' => '',
+      'weight' => 0,
       'plugin' => $this->pluginDefinition['id'],
     ];
   }
@@ -110,6 +111,13 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
    */
   public function getName() {
     return $this->configuration['name'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWeight() {
+    return $this->configuration['weight'];
   }
 
   /**
