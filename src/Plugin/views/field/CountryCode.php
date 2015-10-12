@@ -86,7 +86,7 @@ class CountryCode extends FieldPluginBase {
    */
   public function render(ResultRow $values) {
     $value = $this->getValue($values);
-    if (!empty($this->options['display_name'])) {
+    if (!empty($this->options['display_name']) && !empty($value)) {
       $countries = $this->countryRepository->getList();
       if (isset($countries[$value])) {
         $value = $countries[$value];
