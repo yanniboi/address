@@ -86,7 +86,7 @@ class Subdivision extends FieldPluginBase {
 
     if (!$needsParent || !empty($parentId)) {
       $subdivisions = $this->subdivisionRepository->getList($address->country_code, $parentId);
-      if ($subdivisions[$value]) {
+      if (isset($subdivisions[$value])) {
         $value = $subdivisions[$value];
       }
     }
