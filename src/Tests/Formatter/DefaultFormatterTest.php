@@ -164,8 +164,8 @@ class DefaultFormatterTest extends KernelTestBase {
     \Drupal::languageManager()->setConfigOverrideLanguage($language);
 
     $entity = EntityTest::create([]);
-    $translation = $entity->addTranslation('zh-hant', []);
-    $translation->{$this->fieldName} = [
+    $entity->{$this->fieldName} = [
+      'langcode' => 'zh-hant',
       'country_code' => 'TW',
       'administrative_area' => 'TW-TPE',
       'locality' => 'TW-TPE-e3cc33',
@@ -175,7 +175,7 @@ class DefaultFormatterTest extends KernelTestBase {
       'organization' => 'Giant <h2>Bike</h2> Store',
       'recipient' => 'Mr. Liu',
     ];
-    $this->renderEntityFields($translation, $this->display);
+    $this->renderEntityFields($entity, $this->display);
     $expected = implode('', [
       'line1' => '<p translate="no">',
       'line2' => '<span class="country">台灣</span><br>' . "\n",

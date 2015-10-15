@@ -251,6 +251,12 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $countryList = $missingElement + $countryList;
     }
 
+
+    // Calling initializeLangcode() every time, and not just when the field
+    // is empty, ensures that the langcode can be changed on subsequent
+    // edits (because the entity or interface language changed, for example).
+    $langcode = $item->initializeLangcode();
+
     $element += [
       '#type' => 'details',
       '#collapsible' => TRUE,
@@ -270,6 +276,10 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       ],
       // Pass the id along to other methods.
       '#wrapper_id' => $wrapperId,
+    ];
+    $element['langcode'] = [
+      '#type' => 'value',
+      '#value' => $langcode,
     ];
     $element['country_code'] = [
       '#type' => 'select',

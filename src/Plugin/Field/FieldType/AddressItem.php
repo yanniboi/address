@@ -15,6 +15,7 @@ use Drupal\address\LabelHelper;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -43,6 +44,10 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   public static function schema(FieldStorageDefinitionInterface $fieldDefinition) {
     return [
       'columns' => [
+        'langcode' => [
+          'type' => 'varchar',
+          'length' => 32,
+        ],
         'country_code' => [
           'type' => 'varchar',
           'length' => 2,
@@ -91,6 +96,9 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
+    $properties = [];
+    $properties['langcode'] = DataDefinition::create('language')
+      ->setLabel(t('The language code.'));
     $properties['country_code'] = DataDefinition::create('string')
       ->setLabel(t('The two-letter country code.'));
     $properties['administrative_area'] = DataDefinition::create('string')
@@ -122,6 +130,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
     return [
       'available_countries' => [],
       'fields' => array_values(AddressField::getAll()),
+      'langcode_override' => '',
     ] + parent::defaultFieldSettings();
   }
 
@@ -129,6 +138,15 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    * {@inheritdoc}
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
+    $languages = \Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL);
+    $languageOptions = [];
+    foreach ($languages as $langcode => $language) {
+      // Only list real languages (English, French, but not "Not specified").
+      if (!$language->isLocked()) {
+        $languageOptions[$langcode] = $language->getName();
+      }
+    }
+
     $element = [];
     $element['available_countries'] = [
       '#type' => 'select',
@@ -146,6 +164,15 @@ class AddressItem extends FieldItemBase implements AddressInterface {
       '#default_value' => $this->getSetting('fields'),
       '#options' => LabelHelper::getGenericFieldLabels(),
       '#required' => TRUE,
+    ];
+    $element['langcode_override'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Language override'),
+      '#description' => $this->t('Ensures entered addresses are always formatted in the same language.'),
+      '#options' => $languageOptions,
+      '#default_value' => $this->getSetting('langcode_override'),
+      '#empty_option' => $this->t('- No override -'),
+      '#access' => \Drupal::languageManager()->isMultilingual(),
     ];
 
     return $element;
@@ -170,6 +197,48 @@ class AddressItem extends FieldItemBase implements AddressInterface {
     }
 
     return static::$availableCountries[$definitionId];
+  }
+
+  /**
+   * Initializes and returns the langcode property for the current field.
+   *
+   * Some countries use separate address formats for the local language VS
+   * other languages. For example, China uses major-to-minor ordering
+   * when the address is entered in Chinese, and minor-to-major when the
+   * address is entered in other languages.
+   * This means that the address must remember which language it was
+   * entered in, to ensure consistent formatting later on.
+   *
+   * - For translatable entities this information comes from the field langcode.
+   * - Non-translatable entities have no way to provide this information, since
+   *   the field langcode never changes. In this case the field must store
+   *   the interface language at the time of address creation.
+   * - It is also possible to override the used language via field settings,
+   *   in case the language is always known (e.g. a field storing the "english
+   *   address" on a chinese article).
+   *
+   * The langcode property is intepreted by getLocale(), and in case it's NULL,
+   * the field langcode is returned instead (indicating a non-multilingual site
+   * or a translatable parent entity).
+   *
+   * @return string|null
+   *   The langcode, or NULL if the field langcode should be used instead.
+   */
+  public function initializeLangcode() {
+    $this->langcode = NULL;
+    $languageManager = \Drupal::languageManager();
+    if (!$languageManager->isMultilingual()) {
+      return;
+    }
+
+    if ($override = $this->getSetting('langcode_override')) {
+      $this->langcode = $override;
+    }
+    elseif (!$this->getEntity()->isTranslatable()) {
+      $this->langcode = $languageManager->getConfigOverrideLanguage()->getId();
+    }
+
+    return $this->langcode;
   }
 
   /**
@@ -198,7 +267,14 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    * {@inheritdoc}
    */
   public function getLocale() {
-    return $this->getLangcode();
+    $langcode = $this->langcode;
+    if (!$langcode) {
+      // If no langcode was stored, fallback to the field langcode.
+      // Documented in initializeLangcode().
+      $langcode = $this->getLangcode();
+    }
+
+    return $langcode;
   }
 
   /**

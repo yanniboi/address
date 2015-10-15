@@ -114,6 +114,9 @@ field.value.address:
   type: mapping
   label: 'Default value'
   mapping:
+    langcode:
+      type: string
+      label: 'Language code'
     country_code:
       type: string
       label: 'Country code'
@@ -159,6 +162,9 @@ field.field_settings.address:
       label: 'Used fields'
       sequence:
         - type: string
+    langcode_override:
+      type: string
+      label: 'Language override'
 
 field.widget.settings.address_default:
   type: mapping
