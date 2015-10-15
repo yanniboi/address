@@ -37,6 +37,79 @@ address.address_format.*:
       type: string
       label: 'Postal code prefix'
 
+address.zone.*:
+  type: config_entity
+  label: 'Zone'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    name:
+      type: label
+      label: 'Name'
+    scope:
+      type: string
+      label: 'Scope'
+    priority:
+      type: integer
+      label: 'Priority'
+    members:
+      type: sequence
+      label: 'Members'
+      sequence:
+        type: address.zone_member.[plugin]
+
+address.zone_member:
+  type: mapping
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    name:
+      type: label
+      label: 'Name'
+    weight:
+      type: integer
+      label: 'Weight'
+    plugin:
+      type: string
+      label: 'Plugin'
+
+address.zone_member.country:
+  type: address.zone_member
+  label: 'Zone member (Country)'
+  mapping:
+    country_code:
+      type: string
+      label: 'Country code'
+    administrative_area:
+      type: string
+      label: 'Administrative area'
+    locality:
+      type: string
+      label: 'Locality'
+    dependent_locality:
+      type: string
+      label: 'Dependent locality'
+    included_postal_codes:
+      type: string
+      label: 'Included postal codes'
+    excluded_postal_codes:
+      type: string
+      label: 'Excluded postal codes'
+
+address.zone_member.eu:
+  type: address.zone_member
+  label: 'Zone member (EU)'
+
+address.zone_member.zone:
+  type: address.zone_member
+  label: 'Zone member (Zone)'
+  mapping:
+    zone:
+      type: string
+      label: 'Zone ID'
+
 field.value.address:
   type: mapping
   label: 'Default value'
