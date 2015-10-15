@@ -159,13 +159,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     $countryList = $this->countryRepository->getList();
 
     $element = [];
-    $element['default_country'] = array(
+    $element['default_country'] = [
       '#type' => 'select',
       '#title' => $this->t('Default country'),
       '#options' => ['site_default' => $this->t('- Site default -')] + $countryList,
       '#default_value' => $this->getSetting('default_country'),
       '#empty_value' => '',
-    );
+    ];
 
     return $element;
   }

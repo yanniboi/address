@@ -64,7 +64,7 @@ class CountryCode extends FieldPluginBase {
    */
   protected function defineOptions() {
     $options = parent::defineOptions();
-    $options['display_name'] = array('default' => TRUE);
+    $options['display_name'] = ['default' => TRUE];
 
     return $options;
   }
@@ -73,11 +73,11 @@ class CountryCode extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
-    $form['display_name'] = array(
+    $form['display_name'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Display the localized country name instead of the two character country code'),
       '#default_value' => !empty($this->options['display_name']),
-    );
+    ];
     parent::buildOptionsForm($form, $form_state);
   }
 
