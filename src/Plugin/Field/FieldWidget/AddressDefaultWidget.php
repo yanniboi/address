@@ -251,7 +251,6 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $countryList = $missingElement + $countryList;
     }
 
-
     // Calling initializeLangcode() every time, and not just when the field
     // is empty, ensures that the langcode can be changed on subsequent
     // edits (because the entity or interface language changed, for example).
@@ -278,27 +277,37 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       '#wrapper_id' => $wrapperId,
     ];
     $element['langcode'] = [
-      '#type' => 'value',
+      '#type' => 'hidden',
       '#value' => $langcode,
     ];
-    $element['country_code'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Country'),
-      '#options' => $countryList,
-      '#default_value' => $countryCode,
-      '#required' => $element['#required'],
-      '#empty_value' => '',
-      '#limit_validation_errors' => [],
-      '#ajax' => [
-        'callback' => [get_class($this), 'ajaxRefresh'],
-        'wrapper' => $wrapperId,
-      ],
-      '#attributes' => [
-        'class' => ['country'],
-        'autocomplete' => 'country',
-      ],
-      '#weight' => -100,
-    ];
+    // Hide the country dropdown when there is only one possible value.
+    if (count($countryList) == 1 && $this->fieldDefinition->isRequired()) {
+      $countryCode = key($availableCountries);
+      $element['country_code'] = [
+        '#type' => 'hidden',
+        '#value' => $countryCode,
+      ];
+    }
+    else {
+      $element['country_code'] = [
+        '#type' => 'select',
+        '#title' => $this->t('Country'),
+        '#options' => $countryList,
+        '#default_value' => $countryCode,
+        '#required' => $element['#required'],
+        '#empty_value' => '',
+        '#limit_validation_errors' => [],
+        '#ajax' => [
+          'callback' => [get_class($this), 'ajaxRefresh'],
+          'wrapper' => $wrapperId,
+        ],
+        '#attributes' => [
+          'class' => ['country'],
+          'autocomplete' => 'country',
+        ],
+        '#weight' => -100,
+      ];
+    }
     if (!empty($countryCode)) {
       $element = $this->addressElements($element, $values);
     }

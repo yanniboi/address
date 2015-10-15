@@ -223,6 +223,27 @@ class AddressDefaultWidgetTest extends WebTestBase {
     $this->assertOptionSelected('edit-field-address-0-administrative-area', $address['administrative_area']);
     $this->assertFieldByName($fieldName . '[0][postal_code]', $address['postal_code']);
     $this->assertOptionSelected('edit-field-address-0-country-code', $address['country_code']);
+
+    // Test the widget with only one available country.
+    // Since the field is required, the country selector should be hidden.
+    $countries = ['US'];
+    $edit = [];
+    $edit['settings[available_countries][]'] = array_map(function ($country) {
+      return $country;
+    }, $countries);
+    $this->drupalPostForm($this->fieldConfigUrl, $edit, t('Save settings'));
+
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertNoFieldByName($fieldName . '[0][country_code]');
+    // Submitting the form should result in no data loss.
+    $this->drupalPostForm(NULL, [], t('Save'));
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertFieldByName($fieldName . '[0][recipient]', $address['recipient']);
+    $this->assertFieldByName($fieldName . '[0][organization]', $address['organization']);
+    $this->assertFieldByName($fieldName . '[0][address_line1]', $address['address_line1']);
+    $this->assertFieldByName($fieldName . '[0][locality]', $address['locality']);
+    $this->assertOptionSelected('edit-field-address-0-administrative-area', $address['administrative_area']);
+    $this->assertFieldByName($fieldName . '[0][postal_code]', $address['postal_code']);
   }
 
   /**
