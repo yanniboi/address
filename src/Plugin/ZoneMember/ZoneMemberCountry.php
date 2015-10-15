@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Matches a country, its subdivisions, and its postal codes.
  *
  * @ZoneMember(
- *   id = "zone_member_country",
+ *   id = "country",
  *   name = @Translation("Country"),
  * )
  */

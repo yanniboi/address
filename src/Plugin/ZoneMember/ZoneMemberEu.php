@@ -16,7 +16,7 @@ use CommerceGuys\Addressing\Model\AddressInterface;
  * the need to create and call 28 ZoneMemberCountry instances.
  *
  * @ZoneMember(
- *   id = "zone_member_eu",
+ *   id = "eu",
  *   name = @Translation("EU"),
  * )
  */

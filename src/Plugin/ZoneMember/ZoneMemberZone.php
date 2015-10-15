@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Matches a single zone.
  *
  * @ZoneMember(
- *   id = "zone_member_zone",
+ *   id = "zone",
  *   name = @Translation("Zone"),
  * )
  */
