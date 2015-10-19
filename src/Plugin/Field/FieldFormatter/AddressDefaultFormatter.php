@@ -115,7 +115,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
     $elements = [];
     foreach ($items as $delta => $item) {
       $elements[$delta] = [
-        '#prefix' => '<p translate="no">',
+        '#prefix' => '<p class="address" translate="no">',
         '#suffix' => '</p>',
         '#post_render' => [
           [get_class($this), 'postRender'],

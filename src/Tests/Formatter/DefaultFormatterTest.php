@@ -112,7 +112,7 @@ class DefaultFormatterTest extends KernelTestBase {
     // Andorra has no predefined administrative areas, but it does have
     // predefined localities, which must be shown.
     $expected = implode('', [
-      'line1' => '<p translate="no">',
+      'line1' => '<p class="address" translate="no">',
       'line2' => '<span class="address-line1">C. Prat de la Creu, 62-64</span><br>' . "\n",
       'line3' => '<span class="postal-code">AD500</span> <span class="locality">Parròquia d&#039;Andorra la Vella</span><br>' . "\n",
       'line4' => '<span class="country">Andorra</span>',
@@ -134,7 +134,7 @@ class DefaultFormatterTest extends KernelTestBase {
     ];
     $this->renderEntityFields($entity, $this->display);
     $expected = implode('', [
-      'line1' => '<p translate="no">',
+      'line1' => '<p class="address" translate="no">',
       'line2' => '<span class="address-line1">Some Street 12</span><br>' . "\n",
       'line3' => '<span class="locality">Ahuachapán</span><br>' . "\n",
       'line4' => '<span class="administrative-area">Ahuachapán</span><br>' . "\n",
@@ -146,7 +146,7 @@ class DefaultFormatterTest extends KernelTestBase {
     $entity->{$this->fieldName}->postal_code = 'CP 2101';
     $this->renderEntityFields($entity, $this->display);
     $expected = implode('', [
-      'line1' => '<p translate="no">',
+      'line1' => '<p class="address" translate="no">',
       'line2' => '<span class="address-line1">Some Street 12</span><br>' . "\n",
       'line3' => '<span class="postal-code">CP 2101</span>-<span class="locality">Ahuachapán</span><br>' . "\n",
       'line4' => '<span class="administrative-area">Ahuachapán</span><br>' . "\n",
@@ -177,7 +177,7 @@ class DefaultFormatterTest extends KernelTestBase {
     ];
     $this->renderEntityFields($entity, $this->display);
     $expected = implode('', [
-      'line1' => '<p translate="no">',
+      'line1' => '<p class="address" translate="no">',
       'line2' => '<span class="country">台灣</span><br>' . "\n",
       'line3' => '<span class="postal-code">106</span><br>' . "\n",
       'line4' => '<span class="administrative-area">台北市</span><span class="locality">大安區</span><br>' . "\n",
@@ -202,7 +202,7 @@ class DefaultFormatterTest extends KernelTestBase {
     ];
     $this->renderEntityFields($entity, $this->display);
     $expected = implode('', [
-      'line1' => '<p translate="no">',
+      'line1' => '<p class="address" translate="no">',
       'line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
       'line3' => '<span class="administrative-area">CA</span> <span class="postal-code">94043</span><br>' . "\n",
       'line4' => '<span class="country">United States</span>',
@@ -215,7 +215,7 @@ class DefaultFormatterTest extends KernelTestBase {
     $entity->{$this->fieldName}->administrative_area = '';
     $this->renderEntityFields($entity, $this->display);
     $expected = implode('', [
-      'line1' => '<p translate="no">',
+      'line1' => '<p class="address" translate="no">',
       'line2' => '<span class="address-line1">1098 Alta Ave</span><br>' . "\n",
       'line3' => '<span class="locality">Mountain View</span>, <span class="postal-code">94043</span><br>' . "\n",
       'line4' => '<span class="country">United States</span>',
