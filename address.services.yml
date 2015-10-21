@@ -19,6 +19,10 @@ services:
     class: Drupal\address\Repository\ZoneRepository
     arguments: ['@entity.manager']
 
+  address.postal_label_formatter:
+    class: CommerceGuys\Addressing\Formatter\PostalLabelFormatter
+    arguments: ['@address.address_format_repository', '@address.country_repository', '@address.subdivision_repository']
+
   plugin.manager.address.zone_member:
     class: Drupal\address\ZoneMemberManager
     parent: default_plugin_manager
