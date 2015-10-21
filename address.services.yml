@@ -15,6 +15,10 @@ services:
     class: Drupal\address\Repository\SubdivisionRepository
     arguments: ['@cache.data', '@language_manager']
 
+  address.zone_repository:
+    class: Drupal\address\Repository\ZoneRepository
+    arguments: ['@entity.manager']
+
   plugin.manager.address.zone_member:
     class: Drupal\address\ZoneMemberManager
     parent: default_plugin_manager
