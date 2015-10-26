@@ -22,14 +22,17 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   id = "address_format",
  *   label = @Translation("Address format"),
  *   handlers = {
+ *    "access" = "Drupal\address\AddressFormatAccessControlHandler",
+ *     "list_builder" = "Drupal\address\AddressFormatListBuilder",
+ *     "storage" = "Drupal\address\AddressFormatStorage",
  *     "form" = {
  *       "add" = "Drupal\address\Form\AddressFormatForm",
  *       "edit" = "Drupal\address\Form\AddressFormatForm",
  *       "delete" = "Drupal\address\Form\AddressFormatDeleteForm"
  *     },
- *     "list_builder" = "Drupal\address\AddressFormatListBuilder",
- *     "access" = "Drupal\address\AddressFormatAccessControlHandler",
- *     "storage" = "Drupal\address\AddressFormatStorage",
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     }
  *   },
  *   admin_permission = "administer address formats",
  *   config_prefix = "address_format",

@@ -19,12 +19,15 @@ use CommerceGuys\Zone\Exception\UnexpectedTypeException;
  *   id = "zone",
  *   label = @Translation("Zone"),
  *   handlers = {
+ *     "list_builder" = "Drupal\address\ZoneListBuilder",
  *     "form" = {
  *       "add" = "Drupal\address\Form\ZoneForm",
  *       "edit" = "Drupal\address\Form\ZoneForm",
  *       "delete" = "Drupal\Core\Entity\EntityDeleteForm"
  *     },
- *     "list_builder" = "Drupal\address\ZoneListBuilder"
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     }
  *   },
  *   admin_permission = "administer zones",
  *   config_prefix = "zone",
