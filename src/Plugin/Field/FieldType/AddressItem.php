@@ -97,7 +97,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
     $properties = [];
-    $properties['langcode'] = DataDefinition::create('language')
+    $properties['langcode'] = DataDefinition::create('string')
       ->setLabel(t('The language code.'));
     $properties['country_code'] = DataDefinition::create('string')
       ->setLabel(t('The two-letter country code.'));
