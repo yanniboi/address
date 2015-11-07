@@ -24,7 +24,7 @@ class FieldHelper {
    *   The property name.
    */
   public static function getPropertyName($field) {
-    $propertyMapping = [
+    $property_mapping = [
       AddressField::ADMINISTRATIVE_AREA => 'administrative_area',
       AddressField::LOCALITY => 'locality',
       AddressField::DEPENDENT_LOCALITY => 'dependent_locality',
@@ -36,7 +36,7 @@ class FieldHelper {
       AddressField::RECIPIENT => 'recipient',
     ];
 
-    return isset($propertyMapping[$field]) ? $propertyMapping[$field] : NULL;
+    return isset($property_mapping[$field]) ? $property_mapping[$field] : NULL;
   }
 
   /**
@@ -51,7 +51,7 @@ class FieldHelper {
    *   The autocomplete attribute.
    */
   public static function getAutocompleteAttribute($field) {
-    $autocompleteMapping = [
+    $autocomplete_mapping = [
       AddressField::ADMINISTRATIVE_AREA => 'address-level1',
       AddressField::LOCALITY => 'address-level2',
       AddressField::DEPENDENT_LOCALITY => 'address-level3',
@@ -63,7 +63,7 @@ class FieldHelper {
       AddressField::RECIPIENT => 'name',
     ];
 
-    return isset($autocompleteMapping[$field]) ? $autocompleteMapping[$field] : NULL;
+    return isset($autocomplete_mapping[$field]) ? $autocomplete_mapping[$field] : NULL;
   }
 
 }

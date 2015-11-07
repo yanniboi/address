@@ -41,7 +41,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public static function schema(FieldStorageDefinitionInterface $fieldDefinition) {
+  public static function schema(FieldStorageDefinitionInterface $field_definition) {
     return [
       'columns' => [
         'langcode' => [
@@ -95,7 +95,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   /**
    * {@inheritdoc}
    */
-  public static function propertyDefinitions(FieldStorageDefinitionInterface $fieldDefinition) {
+  public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties = [];
     $properties['langcode'] = DataDefinition::create('string')
       ->setLabel(t('The language code.'));
@@ -139,11 +139,11 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $languages = \Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL);
-    $languageOptions = [];
+    $language_options = [];
     foreach ($languages as $langcode => $language) {
       // Only list real languages (English, French, but not "Not specified").
       if (!$language->isLocked()) {
-        $languageOptions[$langcode] = $language->getName();
+        $language_options[$langcode] = $language->getName();
       }
     }
 
@@ -169,7 +169,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
       '#type' => 'select',
       '#title' => $this->t('Language override'),
       '#description' => $this->t('Ensures entered addresses are always formatted in the same language.'),
-      '#options' => $languageOptions,
+      '#options' => $language_options,
       '#default_value' => $this->getSetting('langcode_override'),
       '#empty_option' => $this->t('- No override -'),
       '#access' => \Drupal::languageManager()->isMultilingual(),
@@ -186,17 +186,17 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public function getAvailableCountries() {
     // Alter the list once per field, instead of once per field delta.
-    $fieldDefinition = $this->getFieldDefinition();
-    $definitionId = spl_object_hash($fieldDefinition);
-    if (!isset(static::$availableCountries[$definitionId])) {
-      $availableCountries = array_filter($this->getSetting('available_countries'));
-      $eventDispatcher = \Drupal::service('event_dispatcher');
-      $event = new AvailableCountriesEvent($availableCountries, $fieldDefinition);
-      $eventDispatcher->dispatch(AddressEvents::AVAILABLE_COUNTRIES, $event);
-      static::$availableCountries[$definitionId] = $event->getAvailableCountries();
+    $field_definition = $this->getFieldDefinition();
+    $definition_id = spl_object_hash($field_definition);
+    if (!isset(static::$availableCountries[$definition_id])) {
+      $available_countries = array_filter($this->getSetting('available_countries'));
+      $event_dispatcher = \Drupal::service('event_dispatcher');
+      $event = new AvailableCountriesEvent($available_countries, $field_definition);
+      $event_dispatcher->dispatch(AddressEvents::AVAILABLE_COUNTRIES, $event);
+      static::$availableCountries[$definition_id] = $event->getAvailableCountries();
     }
 
-    return static::$availableCountries[$definitionId];
+    return static::$availableCountries[$definition_id];
   }
 
   /**
@@ -226,8 +226,8 @@ class AddressItem extends FieldItemBase implements AddressInterface {
    */
   public function initializeLangcode() {
     $this->langcode = NULL;
-    $languageManager = \Drupal::languageManager();
-    if (!$languageManager->isMultilingual()) {
+    $language_manager = \Drupal::languageManager();
+    if (!$language_manager->isMultilingual()) {
       return;
     }
 
@@ -235,7 +235,7 @@ class AddressItem extends FieldItemBase implements AddressInterface {
       $this->langcode = $override;
     }
     elseif (!$this->getEntity()->isTranslatable()) {
-      $this->langcode = $languageManager->getConfigOverrideLanguage()->getId();
+      $this->langcode = $language_manager->getConfigOverrideLanguage()->getId();
     }
 
     return $this->langcode;
@@ -247,10 +247,10 @@ class AddressItem extends FieldItemBase implements AddressInterface {
   public function getConstraints() {
     $constraints = parent::getConstraints();
     $manager = \Drupal::typedDataManager()->getValidationConstraintManager();
-    $availableCountries = $this->getAvailableCountries();
-    $enabledFields = array_filter($this->getSetting('fields'));
-    $constraints[] = $manager->create('Country', ['availableCountries' => $availableCountries]);
-    $constraints[] = $manager->create('AddressFormat', ['fields' => $enabledFields]);
+    $available_countries = $this->getAvailableCountries();
+    $enabled_fields = array_filter($this->getSetting('fields'));
+    $constraints[] = $manager->create('Country', ['availableCountries' => $available_countries]);
+    $constraints[] = $manager->create('AddressFormat', ['fields' => $enabled_fields]);
 
     return $constraints;
   }

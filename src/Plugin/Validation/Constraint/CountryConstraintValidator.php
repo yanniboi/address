@@ -30,11 +30,11 @@ class CountryConstraintValidator extends ConstraintValidator implements Containe
   /**
    * Constructs a new CountryConstraintValidator object.
    *
-   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $countryRepository
+   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $country_repository
    *   The country repository.
    */
-  public function __construct(CountryRepositoryInterface $countryRepository) {
-    $this->countryRepository = $countryRepository;
+  public function __construct(CountryRepositoryInterface $country_repository) {
+    $this->countryRepository = $country_repository;
   }
 
   /**
@@ -53,25 +53,25 @@ class CountryConstraintValidator extends ConstraintValidator implements Containe
     }
 
     $address = $value;
-    $countryCode = $address->getCountryCode();
-    if ($countryCode === NULL || $countryCode === '') {
+    $country_code = $address->getCountryCode();
+    if ($country_code === NULL || $country_code === '') {
       return;
     }
 
     $countries = $this->countryRepository->getList();
-    if (!isset($countries[$countryCode])) {
+    if (!isset($countries[$country_code])) {
       $this->context->buildViolation($constraint->invalidMessage)
         ->atPath('country_code')
-        ->setParameter('%value', $this->formatValue($countryCode))
+        ->setParameter('%value', $this->formatValue($country_code))
         ->addViolation();
       return;
     }
 
-    $availableCountries = $constraint->availableCountries;
-     if (!empty($availableCountries) && !in_array($countryCode, $availableCountries)) {
+    $available_countries = $constraint->availableCountries;
+     if (!empty($available_countries) && !in_array($country_code, $available_countries)) {
        $this->context->buildViolation($constraint->notAvailableMessage)
           ->atPath('country_code')
-          ->setParameter('%value', $this->formatValue($countryCode))
+          ->setParameter('%value', $this->formatValue($country_code))
           ->addViolation();
     }
   }

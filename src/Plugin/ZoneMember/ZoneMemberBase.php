@@ -27,12 +27,12 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->setConfiguration($configuration);
-    if (isset($pluginDefinition['parent_zone'])) {
-      $this->parentZone = $pluginDefinition['parent_zone'];
+    if (isset($plugin_definition['parent_zone'])) {
+      $this->parentZone = $plugin_definition['parent_zone'];
     }
   }
 
@@ -65,7 +65,7 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $formState) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['#member'] = $this;
     $form['name'] = [
       '#type' => 'textfield',
@@ -81,14 +81,14 @@ abstract class ZoneMemberBase extends PluginBase implements ZoneMemberInterface 
   /**
    * {@inheritdoc}
    */
-  public function validateConfigurationForm(array &$form, FormStateInterface $formState) {}
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {}
 
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $formState) {
-    if (!$formState->getErrors()) {
-      $this->configuration['name'] = $formState->getValue('name');
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    if (!$form_state->getErrors()) {
+      $this->configuration['name'] = $form_state->getValue('name');
     }
   }
 

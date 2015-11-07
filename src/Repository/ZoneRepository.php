@@ -27,11 +27,11 @@ class ZoneRepository implements ZoneRepositoryInterface {
   /**
    * Creates an ZoneRepository instance.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    */
-  public function __construct(EntityManagerInterface $entityManager) {
-    $this->zoneStorage = $entityManager->getStorage('zone');
+  public function __construct(EntityManagerInterface $entity_manager) {
+    $this->zoneStorage = $entity_manager->getStorage('zone');
   }
 
   /**

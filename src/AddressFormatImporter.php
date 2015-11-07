@@ -41,14 +41,14 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
   /**
    * Constructs a AddressFormatImporter object.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(EntityManagerInterface $entityManager, LanguageManagerInterface $languageManager) {
-    $this->storage = $entityManager->getStorage('address_format');
-    $this->languageManager = $languageManager;
+  public function __construct(EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
+    $this->storage = $entity_manager->getStorage('address_format');
+    $this->languageManager = $language_manager;
     $this->externalRepository = new AddressFormatRepository();
   }
 
@@ -56,12 +56,12 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
    * {@inheritdoc}
    */
   public function importAll() {
-    $addressFormats = $this->externalRepository->getAll();
-    $countryCodes = array_keys($addressFormats);
+    $address_formats = $this->externalRepository->getAll();
+    $country_codes = array_keys($address_formats);
     // It's nicer API-wise to just pass the country codes.
     // The external repository maintains a static cache, so the repeated ->get()
     // calls have minimal performance impact.
-    $this->importEntities($countryCodes);
+    $this->importEntities($country_codes);
 
     if ($this->languageManager->isMultilingual()) {
       $languages = $this->languageManager->getLanguages(LanguageInterface::STATE_CONFIGURABLE);
@@ -72,21 +72,21 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
   /**
    * {@inheritdoc}
    */
-  public function importEntities(array $countryCodes) {
-    foreach ($countryCodes as $countryCode) {
-      $addressFormat = $this->externalRepository->get($countryCode);
+  public function importEntities(array $country_codes) {
+    foreach ($country_codes as $country_code) {
+      $address_format = $this->externalRepository->get($country_code);
       $values = [
         'langcode' => 'en',
-        'countryCode' => $addressFormat->getCountryCode(),
-        'format' => $addressFormat->getFormat(),
-        'requiredFields' => $addressFormat->getRequiredFields(),
-        'uppercaseFields' => $addressFormat->getUppercaseFields(),
-        'administrativeAreaType' => $addressFormat->getAdministrativeAreaType(),
-        'localityType' => $addressFormat->getLocalityType(),
-        'dependentLocalityType' => $addressFormat->getDependentLocalityType(),
-        'postalCodeType' => $addressFormat->getPostalCodeType(),
-        'postalCodePattern' => $addressFormat->getPostalCodePattern(),
-        'postalCodePrefix' => $addressFormat->getPostalCodePrefix(),
+        'countryCode' => $address_format->getCountryCode(),
+        'format' => $address_format->getFormat(),
+        'requiredFields' => $address_format->getRequiredFields(),
+        'uppercaseFields' => $address_format->getUppercaseFields(),
+        'administrativeAreaType' => $address_format->getAdministrativeAreaType(),
+        'localityType' => $address_format->getLocalityType(),
+        'dependentLocalityType' => $address_format->getDependentLocalityType(),
+        'postalCodeType' => $address_format->getPostalCodeType(),
+        'postalCodePattern' => $address_format->getPostalCodePattern(),
+        'postalCodePrefix' => $address_format->getPostalCodePrefix(),
       ];
       $entity = $this->storage->create($values);
       $entity->trustData()->save();
@@ -97,16 +97,16 @@ class AddressFormatImporter implements AddressFormatImporterInterface {
    * {@inheritdoc}
    */
   public function importTranslations(array $langcodes) {
-    $availableTranslations = $this->getAvailableTranslations();
-    $availableTranslations = array_intersect_key($availableTranslations, array_flip($langcodes));
-    foreach ($availableTranslations as $langcode => $countryCodes) {
-      $addressFormats = $this->storage->loadMultiple($countryCodes);
-      foreach ($addressFormats as $countryCode => $addressFormat) {
-        $externalTranslation = $this->externalRepository->get($countryCode, $langcode);
-        $configName = $addressFormat->getConfigDependencyName();
-        $configTranslation = $this->languageManager->getLanguageConfigOverride($langcode, $configName);
-        $configTranslation->set('format', $externalTranslation->getFormat());
-        $configTranslation->save();
+    $available_translations = $this->getAvailableTranslations();
+    $available_translations = array_intersect_key($available_translations, array_flip($langcodes));
+    foreach ($available_translations as $langcode => $country_codes) {
+      $address_formats = $this->storage->loadMultiple($country_codes);
+      foreach ($address_formats as $country_code => $address_format) {
+        $external_translation = $this->externalRepository->get($country_code, $langcode);
+        $config_name = $address_format->getConfigDependencyName();
+        $config_translation = $this->languageManager->getLanguageConfigOverride($langcode, $config_name);
+        $config_translation->set('format', $external_translation->getFormat());
+        $config_translation->save();
       }
     }
   }

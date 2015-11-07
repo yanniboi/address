@@ -36,14 +36,14 @@ class AddressFormatRepository implements AddressFormatRepositoryInterface {
   /**
    * Creates an AddressFormatRepository instance.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(EntityManagerInterface $entityManager, LanguageManagerInterface $languageManager) {
-    $this->formatStorage = $entityManager->getStorage('address_format');
-    $this->languageManager = $languageManager;
+  public function __construct(EntityManagerInterface $entity_manager, LanguageManagerInterface $language_manager) {
+    $this->formatStorage = $entity_manager->getStorage('address_format');
+    $this->languageManager = $language_manager;
   }
 
   /**
@@ -51,21 +51,21 @@ class AddressFormatRepository implements AddressFormatRepositoryInterface {
    */
   public function get($countryCode, $locale = NULL) {
     if ($locale) {
-      $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
+      $original_language = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $locale]));
-      $addressFormat = $this->formatStorage->load($countryCode);
-      $this->languageManager->setConfigOverrideLanguage($originalLanguage);
+      $address_format = $this->formatStorage->load($countryCode);
+      $this->languageManager->setConfigOverrideLanguage($original_language);
     }
     else {
-      $addressFormat = $this->formatStorage->load($countryCode);
+      $address_format = $this->formatStorage->load($countryCode);
     }
 
-    if (!$addressFormat) {
+    if (!$address_format) {
       // No format found for the given country code, fallback to ZZ.
-      $addressFormat = $this->formatStorage->load('ZZ');
+      $address_format = $this->formatStorage->load('ZZ');
     }
 
-    return $addressFormat;
+    return $address_format;
   }
 
   /**
@@ -73,16 +73,16 @@ class AddressFormatRepository implements AddressFormatRepositoryInterface {
    */
   public function getAll($locale = NULL) {
     if ($locale) {
-      $originalLanguage = $this->languageManager->getConfigOverrideLanguage();
+      $original_language = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $locale]));
-      $addressFormats = $this->formatStorage->loadMultiple();
-      $this->languageManager->setConfigOverrideLanguage($originalLanguage);
+      $address_formats = $this->formatStorage->loadMultiple();
+      $this->languageManager->setConfigOverrideLanguage($original_language);
     }
     else {
-      $addressFormats = $this->formatStorage->loadMultiple();
+      $address_formats = $this->formatStorage->loadMultiple();
     }
 
-    return $addressFormats;
+    return $address_formats;
   }
 
 }

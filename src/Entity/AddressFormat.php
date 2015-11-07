@@ -163,8 +163,8 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setCountryCode($countryCode) {
-    $this->countryCode = $countryCode;
+  public function setCountryCode($country_code) {
+    $this->countryCode = $country_code;
     return $this;
   }
 
@@ -178,9 +178,9 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setRequiredFields(array $requiredFields) {
-    AddressField::assertAllExist($requiredFields);
-    $this->requiredFields = $requiredFields;
+  public function setRequiredFields(array $required_fields) {
+    AddressField::assertAllExist($required_fields);
+    $this->requiredFields = $required_fields;
     return $this;
   }
 
@@ -194,9 +194,9 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setUppercaseFields(array $uppercaseFields) {
-    AddressField::assertAllExist($uppercaseFields);
-    $this->uppercaseFields = $uppercaseFields;
+  public function setUppercaseFields(array $uppercase_fields) {
+    AddressField::assertAllExist($uppercase_fields);
+    $this->uppercaseFields = $uppercase_fields;
     return $this;
   }
 
@@ -210,9 +210,9 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setAdministrativeAreaType($administrativeAreaType) {
-    AdministrativeAreaType::assertExists($administrativeAreaType);
-    $this->administrativeAreaType = $administrativeAreaType;
+  public function setAdministrativeAreaType($administrative_area_type) {
+    AdministrativeAreaType::assertExists($administrative_area_type);
+    $this->administrativeAreaType = $administrative_area_type;
     return $this;
   }
 
@@ -226,9 +226,9 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setLocalityType($localityType) {
-    LocalityType::assertExists($localityType);
-    $this->localityType = $localityType;
+  public function setLocalityType($locality_type) {
+    LocalityType::assertExists($locality_type);
+    $this->localityType = $locality_type;
     return $this;
   }
 
@@ -242,9 +242,9 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setDependentLocalityType($dependentLocalityType) {
-    DependentLocalityType::assertExists($dependentLocalityType);
-    $this->dependentLocalityType = $dependentLocalityType;
+  public function setDependentLocalityType($dependent_locality_type) {
+    DependentLocalityType::assertExists($dependent_locality_type);
+    $this->dependentLocalityType = $dependent_locality_type;
     return $this;
   }
 
@@ -258,9 +258,9 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setPostalCodeType($postalCodeType) {
-    PostalCodeType::assertExists($postalCodeType);
-    $this->postalCodeType = $postalCodeType;
+  public function setPostalCodeType($postal_code_type) {
+    PostalCodeType::assertExists($postal_code_type);
+    $this->postalCodeType = $postal_code_type;
     return $this;
   }
 
@@ -274,8 +274,8 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setPostalCodePattern($postalCodePattern) {
-    $this->postalCodePattern = $postalCodePattern;
+  public function setPostalCodePattern($postal_code_pattern) {
+    $this->postalCodePattern = $postal_code_pattern;
     return $this;
   }
 
@@ -289,8 +289,8 @@ class AddressFormat extends ConfigEntityBase implements AddressFormatInterface {
   /**
    * {@inheritdoc}
    */
-  public function setPostalCodePrefix($postalCodePrefix) {
-    $this->postalCodePrefix = $postalCodePrefix;
+  public function setPostalCodePrefix($postal_code_prefix) {
+    $this->postalCodePrefix = $postal_code_prefix;
     return $this;
   }
 

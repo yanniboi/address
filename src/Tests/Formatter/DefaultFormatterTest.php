@@ -65,24 +65,24 @@ class DefaultFormatterTest extends KernelTestBase {
 
     // The address module is never installed, so the importer doesn't run
     // automatically. Instead, we manually import the address formats we need.
-    $countryCodes = ['AD', 'SV', 'TW', 'US', 'ZZ'];
+    $country_codes = ['AD', 'SV', 'TW', 'US', 'ZZ'];
     $importer = \Drupal::service('address.address_format_importer');
-    $importer->importEntities($countryCodes);
+    $importer->importEntities($country_codes);
     $importer->importTranslations(['zh-hant']);
 
     $this->entityType = 'entity_test';
     $this->bundle = $this->entityType;
     $this->fieldName = Unicode::strtolower($this->randomMachineName());
 
-    $fieldStorage = FieldStorageConfig::create([
+    $field_storage = FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'entity_type' => $this->entityType,
       'type' => 'address',
     ]);
-    $fieldStorage->save();
+    $field_storage->save();
 
     $field = FieldConfig::create([
-      'field_storage' => $fieldStorage,
+      'field_storage' => $field_storage,
       'bundle' => $this->bundle,
       'label' => $this->randomMachineName(),
     ]);

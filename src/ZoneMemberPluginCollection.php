@@ -32,24 +32,24 @@ class ZoneMemberPluginCollection extends DefaultLazyPluginCollection {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\address\Entity\ZoneInterface $parentZone
+   * @param \Drupal\address\Entity\ZoneInterface $parent_zone
    *   The parent zone.
    */
-  public function __construct(PluginManagerInterface $manager, array $configurations, ZoneInterface $parentZone) {
+  public function __construct(PluginManagerInterface $manager, array $configurations, ZoneInterface $parent_zone) {
     parent::__construct($manager, $configurations);
 
-    $this->parentZone = $parentZone;
+    $this->parentZone = $parent_zone;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function initializePlugin($instanceId) {
-    $configuration = isset($this->configurations[$instanceId]) ? $this->configurations[$instanceId] : [];
+  protected function initializePlugin($instance_id) {
+    $configuration = isset($this->configurations[$instance_id]) ? $this->configurations[$instance_id] : [];
     if (!isset($configuration[$this->pluginKey])) {
-      throw new PluginNotFoundException($instanceId);
+      throw new PluginNotFoundException($instance_id);
     }
-    $this->set($instanceId, $this->manager->createInstance($configuration[$this->pluginKey], $configuration, $this->parentZone));
+    $this->set($instance_id, $this->manager->createInstance($configuration[$this->pluginKey], $configuration, $this->parentZone));
   }
 
   /**

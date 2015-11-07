@@ -93,45 +93,45 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * Constructs a AddressDefaultWidget object.
    *
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The plugin_id for the widget.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The definition of the field to which the widget is associated.
    * @param array $settings
    *   The widget settings.
-   * @param array $thirdPartySettings
+   * @param array $third_party_settings
    *   Any third party settings.
-   * @param \CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface $addressFormatRepository
+   * @param \CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface $address_format_repository
    *   The address format repository.
-   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $countryRepository
+   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $country_repository
    *   The country repository.
-   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
+   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivision_repository
    *   The subdivision repository.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository, EventDispatcherInterface $eventDispatcher, ConfigFactoryInterface $configFactory) {
-    parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AddressFormatRepositoryInterface $address_format_repository, CountryRepositoryInterface $country_repository, SubdivisionRepositoryInterface $subdivision_repository, EventDispatcherInterface $event_dispatcher, ConfigFactoryInterface $config_factory) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
 
-    $this->addressFormatRepository = $addressFormatRepository;
-    $this->countryRepository = $countryRepository;
-    $this->subdivisionRepository = $subdivisionRepository;
-    $this->eventDispatcher = $eventDispatcher;
-    $this->configFactory = $configFactory;
+    $this->addressFormatRepository = $address_format_repository;
+    $this->countryRepository = $country_repository;
+    $this->subdivisionRepository = $subdivision_repository;
+    $this->eventDispatcher = $event_dispatcher;
+    $this->configFactory = $config_factory;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     // @see \Drupal\Core\Field\WidgetPluginManager::createInstance().
     return new static(
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
@@ -155,14 +155,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $formState) {
-    $countryList = $this->countryRepository->getList();
-
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $country_list = $this->countryRepository->getList();
     $element = [];
     $element['default_country'] = [
       '#type' => 'select',
       '#title' => $this->t('Default country'),
-      '#options' => ['site_default' => $this->t('- Site default -')] + $countryList,
+      '#options' => ['site_default' => $this->t('- Site default -')] + $country_list,
       '#default_value' => $this->getSetting('default_country'),
       '#empty_value' => '',
     ];
@@ -177,28 +176,28 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *
    * @see address_form_field_config_edit_form_alter()
    *
-   * @param array $countryList
+   * @param array $country_list
    *   The filtered country list, in the country_code => name format.
    *
    * @return array
    *   The initial values, keyed by property.
    */
-  protected function getInitialValues(array $countryList) {
-    $defaultCountry = $this->getSetting('default_country');
+  protected function getInitialValues(array $country_list) {
+    $default_country = $this->getSetting('default_country');
     // Resolve the special site_default option.
-    if ($defaultCountry == 'site_default') {
-      $defaultCountry = $this->configFactory->get('system.date')->get('country.default');
+    if ($default_country == 'site_default') {
+      $default_country = $this->configFactory->get('system.date')->get('country.default');
     }
     // Fallback to the first country in the list if the default country is not
     // available, or is empty even though the field is required.
-    $notAvailable = $defaultCountry && !isset($countryList[$defaultCountry]);
-    $emptyButRequired = empty($defaultCountry) && $this->fieldDefinition->isRequired();
-    if ($notAvailable || $emptyButRequired) {
-      $defaultCountry = key($countryList);
+    $not_available = $default_country && !isset($country_list[$default_country]);
+    $empty_but_required = empty($default_country) && $this->fieldDefinition->isRequired();
+    if ($not_available || $empty_but_required) {
+      $default_country = key($country_list);
     }
 
-    $initialValues = [
-      'country_code' => $defaultCountry,
+    $initial_values = [
+      'country_code' => $default_country,
       'administrative_area' => '',
       'locality' => '',
       'dependent_locality' => '',
@@ -210,45 +209,45 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       'recipient' => '',
     ];
     // Allow other modules to alter the values.
-    $event = new InitialValuesEvent($initialValues, $this->fieldDefinition);
+    $event = new InitialValuesEvent($initial_values, $this->fieldDefinition);
     $this->eventDispatcher->dispatch(AddressEvents::INITIAL_VALUES, $event);
-    $initialValues = $event->getInitialValues();
+    $initial_values = $event->getInitialValues();
 
-    return $initialValues;
+    return $initial_values;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $formState) {
-    $fieldName = $this->fieldDefinition->getName();
-    $idPrefix = implode('-', array_merge($element['#field_parents'], [$fieldName]));
-    $wrapperId = Html::getUniqueId($idPrefix . '-ajax-wrapper');
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    $field_name = $this->fieldDefinition->getName();
+    $id_prefix = implode('-', array_merge($element['#field_parents'], [$field_name]));
+    $wrapper_id = Html::getUniqueId($id_prefix . '-ajax-wrapper');
     $item = $items[$delta];
-    $fullCountryList = $this->countryRepository->getList();
-    $countryList = $fullCountryList;
-    $availableCountries = $item->getAvailableCountries();
-    if (!empty($availableCountries)) {
-      $countryList = array_intersect_key($countryList, $availableCountries);
+    $full_country_list = $this->countryRepository->getList();
+    $country_list = $full_country_list;
+    $available_countries = $item->getAvailableCountries();
+    if (!empty($available_countries)) {
+      $country_list = array_intersect_key($country_list, $available_countries);
     }
     // If the form has been rebuilt via AJAX, use the values from user input.
-    // $formState->getValues() can't be used here because it's empty due to
+    // $form_state->getValues() can't be used here because it's empty due to
     // #limit_validaiton_errors.
-    $parents = array_merge($element['#field_parents'], [$fieldName, $delta]);
-    $values = NestedArray::getValue($formState->getUserInput(), $parents, $hasInput);
-    if (!$hasInput) {
-      $values = $item->isEmpty() ? $this->getInitialValues($countryList) : $item->toArray();
+    $parents = array_merge($element['#field_parents'], [$field_name, $delta]);
+    $values = NestedArray::getValue($form_state->getUserInput(), $parents, $has_input);
+    if (!$has_input) {
+      $values = $item->isEmpty() ? $this->getInitialValues($country_list) : $item->toArray();
     }
 
-    $countryCode = $values['country_code'];
-    if (!empty($countryCode) && !isset($countryList[$countryCode])) {
+    $country_code = $values['country_code'];
+    if (!empty($country_code) && !isset($country_list[$country_code])) {
       // This item's country is no longer available. Add it back to the top
       // of the list to ensure all data is displayed properly. The validator
       // can then prevent the save and tell the user to change the country.
       $missingElement = [
-        $countryCode => $fullCountryList[$countryCode],
+        $country_code => $full_country_list[$country_code],
       ];
-      $countryList = $missingElement + $countryList;
+      $country_list = $missingElement + $country_list;
     }
 
     // Calling initializeLangcode() every time, and not just when the field
@@ -260,7 +259,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       '#type' => 'details',
       '#collapsible' => TRUE,
       '#open' => TRUE,
-      '#prefix' => '<div id="' . $wrapperId . '">',
+      '#prefix' => '<div id="' . $wrapper_id . '">',
       '#suffix' => '</div>',
       '#pre_render' => [
         ['Drupal\Core\Render\Element\Details', 'preRenderDetails'],
@@ -274,32 +273,32 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         'library' => ['address/form'],
       ],
       // Pass the id along to other methods.
-      '#wrapper_id' => $wrapperId,
+      '#wrapper_id' => $wrapper_id,
     ];
     $element['langcode'] = [
       '#type' => 'hidden',
       '#value' => $langcode,
     ];
     // Hide the country dropdown when there is only one possible value.
-    if (count($countryList) == 1 && $this->fieldDefinition->isRequired()) {
-      $countryCode = key($availableCountries);
+    if (count($country_list) == 1 && $this->fieldDefinition->isRequired()) {
+      $country_code = key($available_countries);
       $element['country_code'] = [
         '#type' => 'hidden',
-        '#value' => $countryCode,
+        '#value' => $country_code,
       ];
     }
     else {
       $element['country_code'] = [
         '#type' => 'select',
         '#title' => $this->t('Country'),
-        '#options' => $countryList,
-        '#default_value' => $countryCode,
+        '#options' => $country_list,
+        '#default_value' => $country_code,
         '#required' => $element['#required'],
         '#empty_value' => '',
         '#limit_validation_errors' => [],
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
-          'wrapper' => $wrapperId,
+          'wrapper' => $wrapper_id,
         ],
         '#attributes' => [
           'class' => ['country'],
@@ -308,7 +307,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         '#weight' => -100,
       ];
     }
-    if (!empty($countryCode)) {
+    if (!empty($country_code)) {
       $element = $this->addressElements($element, $values);
     }
 
@@ -318,7 +317,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $formState) {
+  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
     return NestedArray::getValue($element, $violation->arrayPropertyPath);
   }
 
@@ -334,13 +333,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The modified form element array containing the format specific elements.
    */
   protected function addressElements(array $element, array $values) {
-    $addressFormat = $this->addressFormatRepository->get($values['country_code']);
-    $requiredFields = $addressFormat->getRequiredFields();
-    $labels = LabelHelper::getFieldLabels($addressFormat);
-    foreach ($addressFormat->getGroupedFields() as $lineIndex => $lineFields) {
-      if (count($lineFields) > 1) {
+    $address_format = $this->addressFormatRepository->get($values['country_code']);
+    $required_fields = $address_format->getRequiredFields();
+    $labels = LabelHelper::getFieldLabels($address_format);
+    foreach ($address_format->getGroupedFields() as $line_index => $line_fields) {
+      if (count($line_fields) > 1) {
         // Used by the #pre_render callback to group fields inline.
-        $element['container' . $lineIndex] = [
+        $element['container' . $line_index] = [
           '#type' => 'container',
           '#attributes' => [
             'class' => ['address-container-inline'],
@@ -348,7 +347,7 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         ];
       }
 
-      foreach ($lineFields as $fieldIndex => $field) {
+      foreach ($line_fields as $field_index => $field) {
         $property = FieldHelper::getPropertyName($field);
         $class = str_replace('_', '-', $property);
 
@@ -356,15 +355,15 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
           '#type' => 'textfield',
           '#title' => $labels[$field],
           '#default_value' => isset($values[$property]) ? $values[$property] : '',
-          '#required' => in_array($field, $requiredFields),
+          '#required' => in_array($field, $required_fields),
           '#size' => isset($this->sizeAttributes[$field]) ? $this->sizeAttributes[$field] : 60,
           '#attributes' => [
             'class' => [$class],
             'autocomplete' => FieldHelper::getAutocompleteAttribute($field),
           ],
         ];
-        if (count($lineFields) > 1) {
-          $element[$property]['#group'] = $lineIndex;
+        if (count($line_fields) > 1) {
+          $element[$property]['#group'] = $line_index;
         }
       }
     }
@@ -373,14 +372,14 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
       $element['address_line2']['#title_display'] = 'invisible';
     }
     // Hide fields that have been disabled in the address field settings.
-    $enabledFields = array_filter($this->getFieldSetting('fields'));
-    $disabledFields = array_diff(AddressField::getAll(), $enabledFields);
-    foreach ($disabledFields as $field) {
+    $enabled_fields = array_filter($this->getFieldSetting('fields'));
+    $disabled_fields = array_diff(AddressField::getAll(), $enabled_fields);
+    foreach ($disabled_fields as $field) {
       $property = FieldHelper::getPropertyName($field);
       $element[$property]['#access'] = FALSE;
     }
     // Add predefined options to the created subdivision elements.
-    $element = $this->processSubdivisionElements($element, $values, $addressFormat);
+    $element = $this->processSubdivisionElements($element, $values, $address_format);
 
     return $element;
   }
@@ -392,35 +391,35 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The existing form element array.
    * @param array $values
    *   An array of address values, keyed by property name.
-   * @param \Drupal\address\Entity\AddressFormatInterface $addressFormat
+   * @param \Drupal\address\Entity\AddressFormatInterface $address_format
    *   The address format.
    *
    * @return array
    *   The processed form element array.
    */
-  protected function processSubdivisionElements(array $element, array $values, AddressFormatInterface $addressFormat) {
+  protected function processSubdivisionElements(array $element, array $values, AddressFormatInterface $address_format) {
     $depth = $this->subdivisionRepository->getDepth($values['country_code']);
     if ($depth === 0) {
       // No predefined data found.
       return $element;
     }
 
-    $subdivisionProperties = [];
-    foreach ($addressFormat->getUsedSubdivisionFields() as $field) {
-      $subdivisionProperties[] = FieldHelper::getPropertyName($field);
+    $subdivision_properties = [];
+    foreach ($address_format->getUsedSubdivisionFields() as $field) {
+      $subdivision_properties[] = FieldHelper::getPropertyName($field);
     }
     // Load and insert the subdivisions for each parent id.
     $currentDepth = 1;
-    foreach ($subdivisionProperties as $index => $property) {
+    foreach ($subdivision_properties as $index => $property) {
       if (!isset($element[$property]) || !Element::isVisibleElement($element[$property])) {
         break;
       }
-      $parentProperty = $index ? $subdivisionProperties[$index - 1] : NULL;
-      if ($parentProperty && empty($values[$parentProperty])) {
+      $parent_property = $index ? $subdivision_properties[$index - 1] : NULL;
+      if ($parent_property && empty($values[$parent_property])) {
         break;
       }
-      $parentId = $parentProperty ? $values[$parentProperty] : NULL;
-      $subdivisions = $this->subdivisionRepository->getList($values['country_code'], $parentId);
+      $parent_id = $parent_property ? $values[$parent_property] : NULL;
+      $subdivisions = $this->subdivisionRepository->getList($values['country_code'], $parent_id);
       if (empty($subdivisions)) {
         break;
       }
@@ -450,13 +449,13 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
     foreach (Element::getVisibleChildren($element) as $key) {
       if (isset($element[$key]['#group'])) {
         // Copy the element to the container and remove the original.
-        $groupIndex = $element[$key]['#group'];
-        $containerKey = 'container' . $groupIndex;
-        $element[$containerKey][$key] = $element[$key];
+        $group_index = $element[$key]['#group'];
+        $container_key = 'container' . $group_index;
+        $element[$container_key][$key] = $element[$key];
         unset($element[$key]);
         // Mark the container for sorting.
-        if (!in_array($containerKey, $sort)) {
-          $sort[] = $containerKey;
+        if (!in_array($container_key, $sort)) {
+          $sort[] = $container_key;
         }
       }
     }
@@ -471,11 +470,11 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   /**
    * Ajax callback.
    */
-  public static function ajaxRefresh(array $form, FormStateInterface $formState) {
-    $countryElement = $formState->getTriggeringElement();
-    $addressElement = NestedArray::getValue($form, array_slice($countryElement['#array_parents'], 0, -1));
+  public static function ajaxRefresh(array $form, FormStateInterface $form_state) {
+    $country_element = $form_state->getTriggeringElement();
+    $address_element = NestedArray::getValue($form, array_slice($country_element['#array_parents'], 0, -1));
 
-    return $addressElement;
+    return $address_element;
   }
 
   /**
@@ -485,19 +484,19 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
    * validation, allowing the values to be cleared early enough to prevent the
    * "Illegal choice" error.
    */
-  public static function clearValues(array $element, FormStateInterface $formState) {
-    $triggeringElement = $formState->getTriggeringElement();
-    if (!$triggeringElement) {
+  public static function clearValues(array $element, FormStateInterface $form_state) {
+    $triggering_element = $form_state->getTriggeringElement();
+    if (!$triggering_element) {
       return $element;
     }
 
-    $triggeringElementName = end($triggeringElement['#parents']);
-    if ($triggeringElementName == 'country_code') {
+    $triggering_element_name = end($triggering_element['#parents']);
+    if ($triggering_element_name == 'country_code') {
       $keys = [
         'dependent_locality', 'locality', 'administrative_area',
         'postal_code', 'sorting_code',
       ];
-      $input = &$formState->getUserInput();
+      $input = &$form_state->getUserInput();
       foreach ($keys as $key) {
         $parents = array_merge($element['#parents'], [$key]);
         NestedArray::setValue($input, $parents, '');

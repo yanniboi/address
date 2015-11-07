@@ -26,23 +26,23 @@ class LabelHelper {
    * term than the field name (Company instead of Organization, Contact name
    * instead of Recipient, etc).
    *
-   * @param \Drupal\address\Entity\AddressFormatInterface $addressFormat
+   * @param \Drupal\address\Entity\AddressFormatInterface $address_format
    *   The address format.
    *
    * @return string[]
    *   An array of labels, keyed by field.
    */
-  public static function getFieldLabels(AddressFormatInterface $addressFormat) {
-    $administrativeAreaType = $addressFormat->getAdministrativeAreaType();
-    $localityType = $addressFormat->getLocalityType();
-    $dependentLocalityType = $addressFormat->getDependentLocalityType();
-    $postalCodeType = $addressFormat->getPostalCodeType();
+  public static function getFieldLabels(AddressFormatInterface $address_format) {
+    $administrative_area_type = $address_format->getAdministrativeAreaType();
+    $locality_type = $address_format->getLocalityType();
+    $dependent_locality_type = $address_format->getDependentLocalityType();
+    $postal_code_type = $address_format->getPostalCodeType();
 
     return [
-      AddressField::ADMINISTRATIVE_AREA => self::getAdministrativeAreaLabel($administrativeAreaType),
-      AddressField::LOCALITY => self::getLocalityLabel($localityType),
-      AddressField::DEPENDENT_LOCALITY => self::getDependentLocalityLabel($dependentLocalityType),
-      AddressField::POSTAL_CODE => self::getPostalCodeLabel($postalCodeType),
+      AddressField::ADMINISTRATIVE_AREA => self::getAdministrativeAreaLabel($administrative_area_type),
+      AddressField::LOCALITY => self::getLocalityLabel($locality_type),
+      AddressField::DEPENDENT_LOCALITY => self::getDependentLocalityLabel($dependent_locality_type),
+      AddressField::POSTAL_CODE => self::getPostalCodeLabel($postal_code_type),
       // Google's library always labels the sorting code field as "Cedex".
       AddressField::SORTING_CODE => t('Cedex'),
       AddressField::ADDRESS_LINE1 => t('Street address'),
@@ -78,20 +78,20 @@ class LabelHelper {
   /**
    * Gets the administrative area label for the given type.
    *
-   * @param string $administrativeAreaType
+   * @param string $administrative_area_type
    *   The administrative area type.
    *
    * @return string
    *   The administrative area label.
    */
-  public static function getAdministrativeAreaLabel($administrativeAreaType) {
-    if (!$administrativeAreaType) {
+  public static function getAdministrativeAreaLabel($administrative_area_type) {
+    if (!$administrative_area_type) {
       return NULL;
     }
-    AdministrativeAreaType::assertExists($administrativeAreaType);
+    AdministrativeAreaType::assertExists($administrative_area_type);
     $labels = self::getAdministrativeAreaLabels();
 
-    return $labels[$administrativeAreaType];
+    return $labels[$administrative_area_type];
   }
 
   /**
@@ -120,20 +120,20 @@ class LabelHelper {
   /**
    * Gets the locality label for the given type.
    *
-   * @param string $localityType
+   * @param string $locality_type
    *   The locality type.
    *
    * @return string
    *   The locality label.
    */
-  public static function getLocalityLabel($localityType) {
-    if (!$localityType) {
+  public static function getLocalityLabel($locality_type) {
+    if (!$locality_type) {
       return NULL;
     }
-    LocalityType::assertExists($localityType);
+    LocalityType::assertExists($locality_type);
     $labels = self::getLocalityLabels();
 
-    return $labels[$localityType];
+    return $labels[$locality_type];
   }
 
   /**
@@ -153,20 +153,20 @@ class LabelHelper {
   /**
    * Gets the dependent locality label for the given type.
    *
-   * @param string $dependentLocalityType
+   * @param string $dependent_locality_type
    *   The dependent locality type.
    *
    * @return string
    *   The dependent locality label.
    */
-  public static function getDependentLocalityLabel($dependentLocalityType) {
-    if (!$dependentLocalityType) {
+  public static function getDependentLocalityLabel($dependent_locality_type) {
+    if (!$dependent_locality_type) {
       return NULL;
     }
-    DependentLocalityType::assertExists($dependentLocalityType);
+    DependentLocalityType::assertExists($dependent_locality_type);
     $labels = self::getDependentLocalityLabels();
 
-    return $labels[$dependentLocalityType];
+    return $labels[$dependent_locality_type];
   }
 
   /**
@@ -187,20 +187,20 @@ class LabelHelper {
   /**
    * Gets the postal code label for the given type.
    *
-   * @param string $postalCodeType
+   * @param string $postal_code_type
    *   The postal code type.
    *
    * @return string
    *   The postal code label.
    */
-  public static function getPostalCodeLabel($postalCodeType) {
-    if (!$postalCodeType) {
+  public static function getPostalCodeLabel($postal_code_type) {
+    if (!$postal_code_type) {
       return NULL;
     }
-    PostalCodeType::assertExists($postalCodeType);
+    PostalCodeType::assertExists($postal_code_type);
     $labels = self::getPostalCodeLabels();
 
-    return $labels[$postalCodeType];
+    return $labels[$postal_code_type];
   }
 
   /**

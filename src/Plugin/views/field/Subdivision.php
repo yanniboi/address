@@ -33,27 +33,27 @@ class Subdivision extends FieldPluginBase {
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The id of the plugin instance.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
+   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivision_repository
    *   The subdivision repository.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, SubdivisionRepositoryInterface $subdivisionRepository) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, SubdivisionRepositoryInterface $subdivision_repository) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->subdivisionRepository = $subdivisionRepository;
+    $this->subdivisionRepository = $subdivision_repository;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('address.subdivision_repository')
     );
   }
@@ -71,21 +71,21 @@ class Subdivision extends FieldPluginBase {
     $address = $entity->{$this->definition['field_name']}->first();
     switch ($this->definition['property']) {
       case 'administrative_area':
-        $parentId = NULL;
-        $needsParent = FALSE;
+        $parent_id = NULL;
+        $needs_parent = FALSE;
         break;
       case 'locality':
-        $parentId = $address->administrative_area;
-        $needsParent = TRUE;
+        $parent_id = $address->administrative_area;
+        $needs_parent = TRUE;
         break;
       case 'dependent_locality':
-        $parentId = $address->locality;
-        $needsParent = TRUE;
+        $parent_id = $address->locality;
+        $needs_parent = TRUE;
         break;
     }
 
-    if (!$needsParent || !empty($parentId)) {
-      $subdivisions = $this->subdivisionRepository->getList($address->country_code, $parentId);
+    if (!$needs_parent || !empty($parent_id)) {
+      $subdivisions = $this->subdivisionRepository->getList($address->country_code, $parent_id);
       if (isset($subdivisions[$value])) {
         $value = $subdivisions[$value];
       }

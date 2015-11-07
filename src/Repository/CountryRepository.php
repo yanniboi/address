@@ -39,12 +39,12 @@ class CountryRepository extends ExternalCountryRepository implements ExternalCou
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    */
-  public function __construct(CacheBackendInterface $cache, LanguageManagerInterface $languageManager) {
+  public function __construct(CacheBackendInterface $cache, LanguageManagerInterface $language_manager) {
     $this->cache = $cache;
-    $this->languageManager = $languageManager;
+    $this->languageManager = $language_manager;
 
     parent::__construct();
   }
@@ -57,19 +57,19 @@ class CountryRepository extends ExternalCountryRepository implements ExternalCou
       return $this->definitions[$locale];
     }
 
-    $cacheKey = 'address.countries.' . $locale;
-    if ($cached = $this->cache->get($cacheKey)) {
+    $cache_key = 'address.countries.' . $locale;
+    if ($cached = $this->cache->get($cache_key)) {
       $this->definitions[$locale] = $cached->data;
     }
     else {
       $filename = $this->definitionPath . $locale . '.json';
       $this->definitions[$locale] = json_decode(file_get_contents($filename), TRUE);
       // Merge-in base definitions.
-      $baseDefinitions = $this->loadBaseDefinitions();
+      $base_definitions = $this->loadBaseDefinitions();
       foreach ($this->definitions[$locale] as $countryCode => $definition) {
-        $this->definitions[$locale][$countryCode] += $baseDefinitions[$countryCode];
+        $this->definitions[$locale][$countryCode] += $base_definitions[$countryCode];
       }
-      $this->cache->set($cacheKey, $this->definitions[$locale], CacheBackendInterface::CACHE_PERMANENT, ['countries']);
+      $this->cache->set($cache_key, $this->definitions[$locale], CacheBackendInterface::CACHE_PERMANENT, ['countries']);
     }
 
     return $this->definitions[$locale];
@@ -85,13 +85,13 @@ class CountryRepository extends ExternalCountryRepository implements ExternalCou
       return $this->baseDefinitions;
     }
 
-    $cacheKey = 'address.countries.base';
-    if ($cached = $this->cache->get($cacheKey)) {
+    $cache_key = 'address.countries.base';
+    if ($cached = $this->cache->get($cache_key)) {
       $this->baseDefinitions = $cached->data;
     }
     else {
       $this->baseDefinitions = json_decode(file_get_contents($this->definitionPath . 'base.json'), TRUE);
-      $this->cache->set($cacheKey, $this->baseDefinitions, CacheBackendInterface::CACHE_PERMANENT, ['countries']);
+      $this->cache->set($cache_key, $this->baseDefinitions, CacheBackendInterface::CACHE_PERMANENT, ['countries']);
     }
 
     return $this->baseDefinitions;

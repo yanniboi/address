@@ -170,8 +170,8 @@ class Zone extends ConfigEntityBase implements ZoneInterface {
    */
   public function getMembers() {
     if (!$this->membersCollection) {
-      $pluginManager = $this->getZoneMemberPluginManager();
-      $this->membersCollection = new ZoneMemberPluginCollection($pluginManager, $this->members, $this);
+      $plugin_manager = $this->getZoneMemberPluginManager();
+      $this->membersCollection = new ZoneMemberPluginCollection($plugin_manager, $this->members, $this);
       $this->membersCollection->sort();
     }
     return $this->membersCollection;

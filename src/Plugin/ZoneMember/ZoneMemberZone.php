@@ -35,27 +35,27 @@ class ZoneMemberZone extends ZoneMemberBase implements ContainerFactoryPluginInt
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The pluginId for the plugin instance.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entityManager
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, EntityManagerInterface $entityManager) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->zoneStorage = $entityManager->getStorage('zone');
+    $this->zoneStorage = $entity_manager->getStorage('zone');
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('entity.manager')
     );
   }
@@ -72,8 +72,8 @@ class ZoneMemberZone extends ZoneMemberBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $formState) {
-    $form = parent::buildConfigurationForm($form, $formState);
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildConfigurationForm($form, $form_state);
     $form['zone'] = [
       '#type' => 'entity_autocomplete',
       '#title' => $this->t('Zone'),
@@ -89,11 +89,11 @@ class ZoneMemberZone extends ZoneMemberBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function submitConfigurationForm(array &$form, FormStateInterface $formState) {
-    parent::submitConfigurationForm($form, $formState);
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
 
-    if (!$formState->getErrors()) {
-      $this->configuration['zone'] = $formState->getValue('zone');
+    if (!$form_state->getErrors()) {
+      $this->configuration['zone'] = $form_state->getValue('zone');
     }
   }
 

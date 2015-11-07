@@ -36,13 +36,13 @@ class AddressFormatConstraintValidator extends ExternalValidator implements Cont
   /**
    * {@inheritdoc}
    */
-  protected function addViolation($field, $message, $invalidValue, AddressFormatInterface $addressFormat) {
-    $labels = LabelHelper::getFieldLabels($addressFormat);
+  protected function addViolation($field, $message, $invalid_value, AddressFormatInterface $address_format) {
+    $labels = LabelHelper::getFieldLabels($address_format);
     $label = $labels[$field];
 
     $this->context->buildViolation($message, ['@name' => $label])
       ->atPath(FieldHelper::getPropertyName($field))
-      ->setInvalidValue($invalidValue)
+      ->setInvalidValue($invalid_value)
       ->addViolation();
   }
 

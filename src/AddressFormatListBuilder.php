@@ -30,7 +30,6 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader() {
     $header['country'] = $this->t('Country');
-
     return $header + parent::buildHeader();
   }
 
@@ -39,7 +38,6 @@ class AddressFormatListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['country'] = $entity->label();
-
     return $row + parent::buildRow($entity);
   }
 

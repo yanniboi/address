@@ -60,43 +60,43 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
   /**
    * Constructs an AddressDefaultFormatter object.
    *
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The plugin_id for the formatter.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
    * @param string $label
    *   The formatter label display setting.
-   * @param string $viewMode
+   * @param string $view_mode
    *   The view mode.
-   * @param array $thirdPartySettings
+   * @param array $third_party_settings
    *   Any third party settings.
-   * @param \CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface $addressFormatRepository
+   * @param \CommerceGuys\Addressing\Repository\AddressFormatRepositoryInterface $address_format_repository
    *   The address format repository.
-   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $countryRepository
+   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $country_repository
    *   The country repository.
-   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivisionRepository
+   * @param \CommerceGuys\Addressing\Repository\SubdivisionRepositoryInterface $subdivision_repository
    *   The subdivision repository.
    */
-  public function __construct($pluginId, $pluginDefinition, FieldDefinitionInterface $fieldDefinition, array $settings, $label, $viewMode, array $thirdPartySettings, AddressFormatRepositoryInterface $addressFormatRepository, CountryRepositoryInterface $countryRepository, SubdivisionRepositoryInterface $subdivisionRepository) {
-    parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $label, $viewMode, $thirdPartySettings);
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AddressFormatRepositoryInterface $address_format_repository, CountryRepositoryInterface $country_repository, SubdivisionRepositoryInterface $subdivision_repository) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
-    $this->addressFormatRepository = $addressFormatRepository;
-    $this->countryRepository = $countryRepository;
-    $this->subdivisionRepository = $subdivisionRepository;
+    $this->addressFormatRepository = $address_format_repository;
+    $this->countryRepository = $country_repository;
+    $this->subdivisionRepository = $subdivision_repository;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     // @see \Drupal\Core\Field\FormatterPluginManager::createInstance().
     return new static(
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['label'],
@@ -144,28 +144,28 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *   A renderable array.
    */
   protected function viewElement(AddressInterface $address, $langcode) {
-    $countryCode = $address->getCountryCode();
+    $country_code = $address->getCountryCode();
     $countries = $this->countryRepository->getList();
-    $addressFormat = $this->addressFormatRepository->get($countryCode, $address->getLocale());
-    $values = $this->getValues($address, $addressFormat);
+    $address_format = $this->addressFormatRepository->get($country_code, $address->getLocale());
+    $values = $this->getValues($address, $address_format);
 
     $element = [];
     $element['address_format'] = [
       '#type' => 'value',
-      '#value' => $addressFormat,
+      '#value' => $address_format,
     ];
     $element['country_code'] = [
       '#type' => 'value',
-      '#value' => $countryCode,
+      '#value' => $country_code,
     ];
     $element['country'] = [
       '#type' => 'html_tag',
       '#tag' => 'span',
       '#attributes' => ['class' => ['country']],
-      '#value' => Html::escape($countries[$countryCode]),
+      '#value' => Html::escape($countries[$country_code]),
       '#placeholder' => '%country',
     ];
-    foreach ($addressFormat->getUsedFields() as $field) {
+    foreach ($address_format->getUsedFields() as $field) {
       $property = FieldHelper::getPropertyName($field);
       $class = str_replace('_', '-', $property);
 
@@ -194,15 +194,15 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *   The new rendered element.
    */
   public static function postRender($content, array $element) {
-    $addressFormat = $element['address_format']['#value'];
-    $formatString = $addressFormat->getFormat();
+    $address_format = $element['address_format']['#value'];
+    $format_string = $address_format->getFormat();
     // Add the country to the bottom or the top of the format string,
     // depending on whether the format is minor-to-major or major-to-minor.
-    if (strpos($formatString, AddressField::ADDRESS_LINE1) < strpos($formatString, AddressField::ADDRESS_LINE2)) {
-      $formatString .= "\n" . '%country';
+    if (strpos($format_string, AddressField::ADDRESS_LINE1) < strpos($format_string, AddressField::ADDRESS_LINE2)) {
+      $format_string .= "\n" . '%country';
     }
     else {
-      $formatString = '%country' . "\n" . $formatString;
+      $format_string = '%country' . "\n" . $format_string;
     }
 
     $replacements = [];
@@ -212,7 +212,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
         $replacements[$child['#placeholder']] = $child['#value'] ? $child['#markup'] : '';
       }
     }
-    $content = self::replacePlaceholders($formatString, $replacements);
+    $content = self::replacePlaceholders($format_string, $replacements);
     $content = nl2br($content, FALSE);
 
     return $content;
@@ -252,13 +252,13 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *
    * @param \Drupal\address\AddressInterface $address
    *   The address.
-   * @param \Drupal\address\Entity\AddressFormatInterface $addressFormat
+   * @param \Drupal\address\Entity\AddressFormatInterface $address_format
    *   The address format.
    *
    * @return array
    *   The values, keyed by address field.
    */
-  protected function getValues(AddressInterface $address, AddressFormatInterface $addressFormat) {
+  protected function getValues(AddressInterface $address, AddressFormatInterface $address_format) {
     $values = [];
     foreach (AddressField::getAll() as $field) {
       $getter = 'get' . ucfirst($field);
@@ -266,7 +266,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
     }
 
     // Replace the subdivision values with the names of any predefined ones.
-    foreach ($addressFormat->getUsedSubdivisionFields() as $field) {
+    foreach ($address_format->getUsedSubdivisionFields() as $field) {
       if (empty($values[$field])) {
         // This level is empty, so there can be no sublevels.
         break;

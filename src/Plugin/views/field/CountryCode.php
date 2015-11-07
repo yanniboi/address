@@ -34,27 +34,27 @@ class CountryCode extends FieldPluginBase {
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string $pluginId
+   * @param string $plugin_id
    *   The id of the plugin instance.
-   * @param mixed $pluginDefinition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $countryRepository
+   * @param \CommerceGuys\Addressing\Repository\CountryRepositoryInterface $country_repository
    *   The country repository.
    */
-  public function __construct(array $configuration, $pluginId, $pluginDefinition, CountryRepositoryInterface $countryRepository) {
-    parent::__construct($configuration, $pluginId, $pluginDefinition);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, CountryRepositoryInterface $country_repository) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    $this->countryRepository = $countryRepository;
+    $this->countryRepository = $country_repository;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
-      $pluginId,
-      $pluginDefinition,
+      $plugin_id,
+      $plugin_definition,
       $container->get('address.country_repository')
     );
   }

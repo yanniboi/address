@@ -36,32 +36,32 @@ class AddressFormatForm extends EntityForm {
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The address format storage.
-   * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $countryRepository
+   * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $country_repository
    *   The country repository.
    */
-  public function __construct(EntityStorageInterface $storage, CountryRepositoryInterface $countryRepository) {
+  public function __construct(EntityStorageInterface $storage, CountryRepositoryInterface $country_repository) {
     $this->storage = $storage;
-    $this->countryRepository = $countryRepository;
+    $this->countryRepository = $country_repository;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entityManager */
-    $entityManager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
+    $entity_manager = $container->get('entity.manager');
 
-    return new static($entityManager->getStorage('address_format'), $container->get('address.country_repository'));
+    return new static($entity_manager->getStorage('address_format'), $container->get('address.country_repository'));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $formState) {
-    $form = parent::form($form, $formState);
-    $addressFormat = $this->entity;
-    $countryCode = $addressFormat->getCountryCode();
-    if ($countryCode == 'ZZ') {
+  public function form(array $form, FormStateInterface $form_state) {
+    $form = parent::form($form, $form_state);
+    $address_format = $this->entity;
+    $country_code = $address_format->getCountryCode();
+    if ($country_code == 'ZZ') {
       $form['countryCode'] = [
         '#type' => 'item',
         '#title' => $this->t('Country'),
@@ -72,10 +72,10 @@ class AddressFormatForm extends EntityForm {
       $form['countryCode'] = [
         '#type' => 'select',
         '#title' => $this->t('Country'),
-        '#default_value' => $addressFormat->getCountryCode(),
+        '#default_value' => $country_code,
         '#required' => TRUE,
         '#options' => $this->countryRepository->getList(),
-        '#disabled' => !$addressFormat->isNew(),
+        '#disabled' => !$address_format->isNew(),
       ];
     }
 
@@ -83,61 +83,61 @@ class AddressFormatForm extends EntityForm {
       '#type' => 'textarea',
       '#title' => $this->t('Format'),
       '#description' => $this->t('Available tokens: @tokens', ['@tokens' => implode(', ', AddressField::getTokens())]),
-      '#default_value' => $addressFormat->getFormat(),
+      '#default_value' => $address_format->getFormat(),
       '#required' => TRUE,
     ];
     $form['requiredFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Required fields'),
       '#options' => LabelHelper::getGenericFieldLabels(),
-      '#default_value' => $addressFormat->getRequiredFields(),
+      '#default_value' => $address_format->getRequiredFields(),
     ];
     $form['uppercaseFields'] = [
       '#type' => 'checkboxes',
       '#title' => t('Uppercase fields'),
       '#description' => t('Uppercased on envelopes to facilitate automatic post handling.'),
       '#options' => LabelHelper::getGenericFieldLabels(),
-      '#default_value' => $addressFormat->getUppercaseFields(),
+      '#default_value' => $address_format->getUppercaseFields(),
     ];
     $form['postalCodePattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Postal code pattern'),
       '#description' => $this->t('Regular expression used to validate postal codes.'),
-      '#default_value' => $addressFormat->getPostalCodePattern(),
+      '#default_value' => $address_format->getPostalCodePattern(),
     ];
     $form['postalCodePrefix'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Postal code prefix'),
       '#description' => $this->t('Added to postal codes when formatting an address for international mailing.'),
-      '#default_value' => $addressFormat->getPostalCodePrefix(),
+      '#default_value' => $address_format->getPostalCodePrefix(),
       '#size' => 5,
     ];
 
     $form['postalCodeType'] = [
       '#type' => 'select',
       '#title' => $this->t('Postal code type'),
-      '#default_value' => $addressFormat->getPostalCodeType(),
+      '#default_value' => $address_format->getPostalCodeType(),
       '#options' =>  LabelHelper::getPostalCodeLabels(),
       '#empty_value' => '',
     ];
     $form['dependentLocalityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Dependent locality type'),
-      '#default_value' => $addressFormat->getDependentLocalityType(),
+      '#default_value' => $address_format->getDependentLocalityType(),
       '#options' => LabelHelper::getDependentLocalityLabels(),
       '#empty_value' => '',
     ];
     $form['localityType'] = [
       '#type' => 'select',
       '#title' => $this->t('Locality type'),
-      '#default_value' => $addressFormat->getLocalityType(),
+      '#default_value' => $address_format->getLocalityType(),
       '#options' => LabelHelper::getLocalityLabels(),
       '#empty_value' => '',
     ];
     $form['administrativeAreaType'] = [
       '#type' => 'select',
       '#title' => $this->t('Administrative area type'),
-      '#default_value' => $addressFormat->getAdministrativeAreaType(),
+      '#default_value' => $address_format->getAdministrativeAreaType(),
       '#options' => LabelHelper::getAdministrativeAreaLabels(),
       '#empty_value' => '',
     ];
@@ -148,29 +148,29 @@ class AddressFormatForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validate(array $form, FormStateInterface $formState) {
-    parent::validate($form, $formState);
+  public function validate(array $form, FormStateInterface $form_state) {
+    parent::validate($form, $form_state);
 
     // Disallow adding an address format for a country that already has one.
     if ($this->entity->isNew()) {
-      $country = $formState->getValue('countryCode');
+      $country = $form_state->getValue('countryCode');
       if ($this->storage->load($country)) {
-        $formState->setErrorByName('countryCode', $this->t('The selected country already has an address format.'));
+        $form_state->setErrorByName('countryCode', $this->t('The selected country already has an address format.'));
       }
     }
 
     // Require the matching type field for the fields specified in the format.
-    $format = $formState->getValue('format');
+    $format = $form_state->getValue('format');
     $requirements = [
       '%postalCode' => 'postalCodeType',
       '%dependentLocality' => 'dependentLocalityType',
       '%locality' => 'localityType',
       '%administrativeArea' => 'administrativeAreaType',
     ];
-    foreach ($requirements as $token => $requiredField) {
-      if (strpos($format, $token) !== FALSE && !$formState->getValue($requiredField)) {
-        $title = $form[$requiredField]['#title'];
-        $formState->setErrorByName($requiredField, $this->t('%title is required.', ['%title' => $title]));
+    foreach ($requirements as $token => $required_field) {
+      if (strpos($format, $token) !== FALSE && !$form_state->getValue($required_field)) {
+        $title = $form[$required_field]['#title'];
+        $form_state->setErrorByName($required_field, $this->t('%title is required.', ['%title' => $title]));
       }
     }
   }
@@ -178,13 +178,12 @@ class AddressFormatForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $formState) {
-    $addressFormat = $this->entity;
-    $addressFormat->save();
+  public function save(array $form, FormStateInterface $form_state) {
+    $this->entity->save();
     drupal_set_message($this->t('Saved the %label address format.', [
-      '%label' => $addressFormat->label(),
+      '%label' => $this->entity->label(),
     ]));
-    $formState->setRedirectUrl($addressFormat->urlInfo('collection'));
+    $form_state->setRedirectUrl($this->entity->urlInfo('collection'));
   }
 
 }

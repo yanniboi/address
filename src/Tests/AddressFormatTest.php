@@ -55,35 +55,35 @@ class AddressFormatTest extends WebTestBase {
    * Test importing address formats using service.
    */
   function testAddressFormatImport() {
-    $externalRepository = new AddressFormatRepository();
-    $externalCount = count($externalRepository->getAll());
+    $external_repository = new AddressFormatRepository();
+    $external_count = count($external_repository->getAll());
     $count = \Drupal::entityQuery('address_format')->count()->execute();
-    $this->assertEqual($externalCount, $count, 'All address formats imported at installation.');
+    $this->assertEqual($external_count, $count, 'All address formats imported at installation.');
   }
 
   /**
    * Tests creating a address format via a form and programmatically.
    */
   function testAddressFormatCreation() {
-    $countryCode = 'CM';
+    $country_code = 'CM';
     $values = [
-      'countryCode' => $countryCode,
+      'countryCode' => $country_code,
       'format' => '%locality',
       'localityType' => 'city',
     ];
-    $addressFormat = AddressFormat::create($values);
-    $addressFormat->save();
-    $this->drupalGet('admin/config/regional/address-formats/manage/' . $addressFormat->id());
+    $address_format = AddressFormat::create($values);
+    $address_format->save();
+    $this->drupalGet('admin/config/regional/address-formats/manage/' . $address_format->id());
     $this->assertResponse(200, 'The new address format can be accessed at admin/config/regional/address-formats.');
 
-    $addressFormat = AddressFormat::load($countryCode);
-    $this->assertEqual($addressFormat->getCountryCode(), $values['countryCode'], 'The new address format has the correct countryCode.');
-    $this->assertEqual($addressFormat->getFormat(), $values['format'], 'The new address format has the correct format string.');
-    $this->assertEqual($addressFormat->getLocalityType(), $values['localityType'], 'The new address format has the correct localityType.');
+    $address_format = AddressFormat::load($country_code);
+    $this->assertEqual($address_format->getCountryCode(), $values['countryCode'], 'The new address format has the correct countryCode.');
+    $this->assertEqual($address_format->getFormat(), $values['format'], 'The new address format has the correct format string.');
+    $this->assertEqual($address_format->getLocalityType(), $values['localityType'], 'The new address format has the correct localityType.');
 
-    $countryCode = 'YE';
+    $country_code = 'YE';
     $edit = [
-      'countryCode' => $countryCode,
+      'countryCode' => $country_code,
       'format' => '%locality',
       'localityType' => 'city',
     ];
@@ -91,54 +91,53 @@ class AddressFormatTest extends WebTestBase {
     $this->assertResponse(200, 'The address format add form can be accessed at admin/config/regional/address-formats/add.');
     $this->drupalPostForm('admin/config/regional/address-formats/add', $edit, t('Save'));
 
-    $addressFormat = AddressFormat::load($countryCode);
-    $this->assertEqual($addressFormat->getCountryCode(), $edit['countryCode'], 'The new address format has the correct countryCode.');
-    $this->assertEqual($addressFormat->getFormat(), $edit['format'], 'The new address format has the correct format string.');
-    $this->assertEqual($addressFormat->getLocalityType(), $edit['localityType'], 'The new address format has the correct localityType.');
+    $address_format = AddressFormat::load($country_code);
+    $this->assertEqual($address_format->getCountryCode(), $edit['countryCode'], 'The new address format has the correct countryCode.');
+    $this->assertEqual($address_format->getFormat(), $edit['format'], 'The new address format has the correct format string.');
+    $this->assertEqual($address_format->getLocalityType(), $edit['localityType'], 'The new address format has the correct localityType.');
   }
 
   /**
    * Tests editing a address format via a form.
    */
   function testAddressFormatEditing() {
-    $countryCode = 'RS';
-    $addressFormat = AddressFormat::load($countryCode);
-    $newPostalCodeType = ($addressFormat->getPostalCodeType() == 'zip') ? 'postal' : 'zip';
+    $country_code = 'RS';
+    $address_format = AddressFormat::load($country_code);
+    $new_postal_code_type = ($address_format->getPostalCodeType() == 'zip') ? 'postal' : 'zip';
     $edit = [
-      'postalCodeType' => $newPostalCodeType,
+      'postalCodeType' => $new_postal_code_type,
     ];
-    $this->drupalPostForm('admin/config/regional/address-formats/manage/' . $countryCode, $edit, t('Save'));
+    $this->drupalPostForm('admin/config/regional/address-formats/manage/' . $country_code, $edit, t('Save'));
 
-    $addressFormat = AddressFormat::load($countryCode);
-    $this->assertEqual($addressFormat->getPostalCodeType(), $newPostalCodeType, 'The address format PostalCodeType has been changed.');
+    $address_format = AddressFormat::load($country_code);
+    $this->assertEqual($address_format->getPostalCodeType(), $new_postal_code_type, 'The address format PostalCodeType has been changed.');
   }
 
   /**
    * Tests deleting a address format via a form.
    */
   public function testAddressFormatDeletion() {
-    $countryCode = 'RS';
-    $this->drupalGet('admin/config/regional/address-formats/manage/' . $countryCode . '/delete');
-    $this->assertResponse(200, 'The address format delete form can be accessed at admin/config/regional/address-formats/manage.'
-      . $countryCode . '/delete');
+    $country_code = 'RS';
+    $this->drupalGet('admin/config/regional/address-formats/manage/' . $country_code . '/delete');
+    $this->assertResponse(200, 'The address format delete form can be accessed.');
     $this->assertText(t('This action cannot be undone.'), 'The address format delete confirmation form is available');
     $this->drupalPostForm(NULL, NULL, t('Delete'));
 
-    $addressFormatExists = (bool) AddressFormat::load($countryCode);
-    $this->assertFalse($addressFormatExists, 'The address format has been deleted form the database.');
+    $address_formatExists = (bool) AddressFormat::load($country_code);
+    $this->assertFalse($address_formatExists, 'The address format has been deleted form the database.');
   }
 
   /**
    * Tests deleting a address format for countryCode = ZZ via a form and from the API.
    */
   function testAddressFormatDeleteZZ() {
-    $countryCode = 'ZZ';
-    $this->drupalGet('admin/config/regional/address-formats/manage/' . $countryCode . '/delete');
+    $country_code = 'ZZ';
+    $this->drupalGet('admin/config/regional/address-formats/manage/' . $country_code . '/delete');
     $this->assertResponse(403, "The delete form for the 'ZZ' address format cannot be accessed.");
     // Try deleting ZZ from the API
-    $addressFormat = AddressFormat::load($countryCode);
+    $address_format = AddressFormat::load($country_code);
     try {
-      $addressFormat->delete();
+      $address_format->delete();
       $this->fail("The 'ZZ' address format can't be deleted.");
     }
     catch (EntityStorageException $e) {

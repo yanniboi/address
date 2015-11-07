@@ -37,14 +37,14 @@ class AvailableCountriesEvent extends Event {
   /**
    * Constructs a new AvailableCountriesEvent object.
    *
-   * @param array $availableCountries
+   * @param array $available_countries
    *   The available countries.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The field definition.
    */
-  public function __construct(array $availableCountries, FieldDefinitionInterface $fieldDefinition) {
-    $this->availableCountries = $availableCountries;
-    $this->fieldDefinition = $fieldDefinition;
+  public function __construct(array $available_countries, FieldDefinitionInterface $field_definition) {
+    $this->availableCountries = $available_countries;
+    $this->fieldDefinition = $field_definition;
   }
 
   /**
@@ -60,13 +60,13 @@ class AvailableCountriesEvent extends Event {
   /**
    * Sets the available countries.
    *
-   * @param array $availableCountries
+   * @param array $available_countries
    *   The available countries to set.
    *
    * @return $this
    */
-  public function setAvailableCountries(array $availableCountries) {
-    $this->availableCountries = $availableCountries;
+  public function setAvailableCountries(array $available_countries) {
+    $this->availableCountries = $available_countries;
     return $this;
   }
 

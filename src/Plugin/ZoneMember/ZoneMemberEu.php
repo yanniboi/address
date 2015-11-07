@@ -35,14 +35,12 @@ class ZoneMemberEu extends ZoneMemberBase {
    * {@inheritdoc}
    */
   public function match(AddressInterface $address) {
-    $euCountries = [
+    $eu_countries = [
       'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GB',
       'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT',
       'RO', 'SE', 'SI', 'SK',
     ];
-    $countryCode = $address->getCountryCode();
-
-    return in_array($countryCode, $euCountries);
+    return in_array($address->getCountryCode(), $eu_countries);
   }
 
 }

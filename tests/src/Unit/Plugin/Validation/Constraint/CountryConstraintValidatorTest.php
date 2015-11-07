@@ -46,12 +46,12 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
   }
 
   protected function createValidator() {
-    $countryRepository = $this->getMock('CommerceGuys\Addressing\Repository\CountryRepositoryInterface');
-    $countryRepository->expects($this->any())
+    $country_repository = $this->getMock('CommerceGuys\Addressing\Repository\CountryRepositoryInterface');
+    $country_repository->expects($this->any())
       ->method('getList')
       ->willReturn(['FR' => 'France', 'RS' => 'Serbia']);
 
-    return new CountryConstraintValidator($countryRepository);
+    return new CountryConstraintValidator($country_repository);
   }
 
   /**
@@ -107,19 +107,19 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
   /**
    * Gets a mock address.
    *
-   * @param string $countryCode
+   * @param string $country_code
    *   The country code to return via $address->getCountryCode().
    *
    * @return \Drupal\address\AddressInterface|\PHPUnit_Framework_MockObject_MockObject
    *   The mock address.
    */
-  protected function getMockAddress($countryCode) {
+  protected function getMockAddress($country_code) {
     $address = $this->getMockBuilder('Drupal\address\AddressInterface')
       ->disableOriginalConstructor()
       ->getMock();
     $address->expects($this->any())
       ->method('getCountryCode')
-      ->willReturn($countryCode);
+      ->willReturn($country_code);
 
     return $address;
   }

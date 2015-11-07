@@ -35,14 +35,14 @@ class InitialValuesEvent extends Event {
   /**
    * Constructs a new InitialValuesEvent object.
    *
-   * @param array $initialValues
+   * @param array $initial_values
    *   The initial values.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The field definition.
    */
-  public function __construct(array $initialValues, FieldDefinitionInterface $fieldDefinition) {
-    $this->initialValues = $initialValues;
-    $this->fieldDefinition = $fieldDefinition;
+  public function __construct(array $initial_values, FieldDefinitionInterface $field_definition) {
+    $this->initialValues = $initial_values;
+    $this->fieldDefinition = $field_definition;
   }
 
   /**
@@ -58,13 +58,13 @@ class InitialValuesEvent extends Event {
   /**
    * Sets the initial values.
    *
-   * @param array $initialValues
+   * @param array $initial_values
    *   The inital values to set.
    *
    * @return $this
    */
-  public function setInitialValues(array $initialValues) {
-    $this->initialValues = $initialValues;
+  public function setInitialValues(array $initial_values) {
+    $this->initialValues = $initial_values;
     return $this;
   }
 
