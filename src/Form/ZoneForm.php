@@ -171,6 +171,7 @@ class ZoneForm extends EntityForm {
       '#value' => $this->t('Add'),
       '#validate' => ['::addMemberValidate'],
       '#submit' => ['::addMemberSubmit'],
+      '#limit_validation_errors' => [['plugin']],
       '#ajax' => [
         'callback' => '::membersAjax',
         'wrapper' => $wrapper_id,
