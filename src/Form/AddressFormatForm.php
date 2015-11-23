@@ -12,6 +12,7 @@ use CommerceGuys\Intl\Country\CountryRepositoryInterface;
 use Drupal\address\LabelHelper;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -34,13 +35,13 @@ class AddressFormatForm extends EntityForm {
   /**
    * Creates an AddressFormatForm instance.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The address format storage.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \CommerceGuys\Intl\Country\CountryRepositoryInterface $country_repository
    *   The country repository.
    */
-  public function __construct(EntityStorageInterface $storage, CountryRepositoryInterface $country_repository) {
-    $this->storage = $storage;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CountryRepositoryInterface $country_repository) {
+    $this->storage = $entity_type_manager->getStorage('address_format');
     $this->countryRepository = $country_repository;
   }
 
@@ -48,10 +49,10 @@ class AddressFormatForm extends EntityForm {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Entity\EntityManagerInterface $entity_manager */
-    $entity_manager = $container->get('entity.manager');
-
-    return new static($entity_manager->getStorage('address_format'), $container->get('address.country_repository'));
+    return new static(
+      $container->get('entity_type.manager'),
+      $container->get('address.country_repository')
+    );
   }
 
   /**
