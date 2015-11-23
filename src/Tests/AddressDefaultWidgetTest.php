@@ -306,7 +306,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
       $edit[$field_name . '[0][country_code]'] = $country;
       $this->drupalPostAjaxForm($this->nodeAddUrl, $edit, $field_name . '[0][country_code]');
       // Compare the found fields to the address format.
-      // Make one assert instead of many asserts for each field's existance.
+      // Make one assert instead of many asserts for each field's existence.
       $elements = $this->xpath('//input[starts-with(@name,"' . $field_name . '")]/@name | //select[starts-with(@name,"' . $field_name . '")]/@name');
       $formFields = [];
       foreach ($elements as $key => $element) {
