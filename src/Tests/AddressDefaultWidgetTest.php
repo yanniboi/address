@@ -44,7 +44,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
   /**
    * Address field instance.
    *
-   * @var Drupal\Field\FieldConfigInterface
+   * @var \Drupal\field\FieldConfigInterface
    */
   protected $field;
 
