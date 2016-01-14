@@ -75,6 +75,9 @@ address.zone_member:
       type: string
       label: 'Plugin'
 
+address.zone_member.*:
+  type: ignore
+
 address.zone_member.country:
   type: address.zone_member
   label: 'Zone member (Country)'
