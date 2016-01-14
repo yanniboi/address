@@ -294,7 +294,6 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         '#options' => $country_list,
         '#default_value' => $country_code,
         '#required' => $element['#required'],
-        '#empty_value' => '',
         '#limit_validation_errors' => [],
         '#ajax' => [
           'callback' => [get_class($this), 'ajaxRefresh'],
@@ -306,6 +305,9 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
         ],
         '#weight' => -100,
       ];
+      if (!$element['#required']) {
+        $element['country_code']['#empty_value'] = '';
+      }
     }
     if (!empty($country_code)) {
       $element = $this->addressElements($element, $values);

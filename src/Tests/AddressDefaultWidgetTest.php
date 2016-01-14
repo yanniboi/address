@@ -212,7 +212,7 @@ class AddressDefaultWidgetTest extends WebTestBase {
     }, $countries);
     $this->drupalPostForm($this->fieldConfigUrl, $edit, t('Save settings'));
 
-    // Acccess article's edit form and confirm the values are unchanged.
+    // Access the article's edit form and confirm the values are unchanged.
     // 'US' should be in the list along with the available countries and should
     // be selected.
     $this->drupalGet('node/' . $node->id() . '/edit');
