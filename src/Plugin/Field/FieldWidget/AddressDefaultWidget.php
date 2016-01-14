@@ -170,6 +170,27 @@ class AddressDefaultWidget extends WidgetBase implements ContainerFactoryPluginI
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $default_country = $this->getSetting('default_country');
+    if (empty($default_country)) {
+      $default_country = t('None');
+    }
+    elseif ($default_country == 'site_default') {
+      $default_country = t('Site default');
+    }
+    else {
+      $country_list = $this->countryRepository->getList();
+      $default_country = $country_list[$default_country];
+    }
+    $summary = [];
+    $summary['default_country'] = $this->t('Default country: @country', ['@country' => $default_country]);
+
+    return $summary;
+  }
+
+  /**
    * Gets the initial values for the widget.
    *
    * This is a replacement for the disabled default values functionality.
