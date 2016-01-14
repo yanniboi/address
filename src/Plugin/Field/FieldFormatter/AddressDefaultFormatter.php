@@ -194,6 +194,7 @@ class AddressDefaultFormatter extends FormatterBase implements ContainerFactoryP
    *   The new rendered element.
    */
   public static function postRender($content, array $element) {
+    /** @var \Drupal\address\Entity\AddressFormatInterface $address_format */
     $address_format = $element['address_format']['#value'];
     $format_string = $address_format->getFormat();
     // Add the country to the bottom or the top of the format string,

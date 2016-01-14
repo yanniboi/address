@@ -59,7 +59,7 @@ class AddressFormatForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
-    /** @var \Drupal\address\Entity\AddressFormatInterface $adress_format **/
+    /** @var \Drupal\address\Entity\AddressFormatInterface $address_format **/
     $address_format = $this->entity;
     $country_code = $address_format->getCountryCode();
     if ($country_code == 'ZZ') {
