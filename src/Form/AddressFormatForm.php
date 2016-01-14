@@ -11,7 +11,6 @@ use CommerceGuys\Addressing\Enum\AddressField;
 use CommerceGuys\Intl\Country\CountryRepositoryInterface;
 use Drupal\address\LabelHelper;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -60,6 +59,7 @@ class AddressFormatForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\address\Entity\AddressFormatInterface $adress_format **/
     $address_format = $this->entity;
     $country_code = $address_format->getCountryCode();
     if ($country_code == 'ZZ') {
@@ -184,7 +184,7 @@ class AddressFormatForm extends EntityForm {
     drupal_set_message($this->t('Saved the %label address format.', [
       '%label' => $this->entity->label(),
     ]));
-    $form_state->setRedirectUrl($this->entity->urlInfo('collection'));
+    $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
 
 }
