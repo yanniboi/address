@@ -108,7 +108,7 @@ class CountryCode extends InOperator {
    * @return string
    *   The field name.
    */
-  public function getFieldName() {
+  protected function getFieldName() {
     if (isset($this->configuration['field_name'])) {
       // Configurable field.
       $field_name = $this->configuration['field_name'];
