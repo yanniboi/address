@@ -16,6 +16,7 @@ Installation
    ```sh
    php modules/composer_manager/scripts/init.php
    composer drupal-update
+   composer dump-autoload
    ```
 This will download the required libraries into the root vendor/ directory.
 
