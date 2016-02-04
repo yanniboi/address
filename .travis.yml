@@ -110,6 +110,7 @@ before_script:
   - drupal-ti before_script
 
 script:
+  - drupal-ti --include ".travis-script.sh"
   - drupal-ti script
 
 after_script:
