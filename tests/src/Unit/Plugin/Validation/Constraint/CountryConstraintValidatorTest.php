@@ -11,13 +11,15 @@ use Drupal\address\Plugin\Validation\Constraint\CountryConstraint;
 use Drupal\address\Plugin\Validation\Constraint\CountryConstraintValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
+use Drupal\address\ConstraintViolationAssertion;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\UnitTestCase;
 
 /**
  * @coversDefaultClass \Drupal\address\Plugin\Validation\Constraint\CountryConstraintValidator
  * @group address
  */
-class CountryConstraintValidatorTest extends KernelTestBase {
+class CountryConstraintValidatorTest extends UnitTestCase {
 
   /**
    * The constraint.
@@ -80,6 +82,24 @@ class CountryConstraintValidatorTest extends KernelTestBase {
       ->willReturn(['FR' => 'France', 'RS' => 'Serbia']);
 
     return new CountryConstraintValidator($country_repository);
+  }
+
+  /**
+   *
+   */
+  protected function assertNoViolation()
+  {
+    $this->assertSame(0, $violationsCount = count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
+  }
+
+  /**
+   * @param $message
+   *
+   * @return ConstraintViolationAssertion
+   */
+  protected function buildViolation($message)
+  {
+    return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
   }
 
   /**
