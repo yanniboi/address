@@ -9,13 +9,15 @@ namespace Drupal\Tests\address\Unit\Plugin\Validation\Constraint;
 
 use Drupal\address\Plugin\Validation\Constraint\CountryConstraint;
 use Drupal\address\Plugin\Validation\Constraint\CountryConstraintValidator;
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContext;
+use Drupal\KernelTests\KernelTestBase;
 
 /**
  * @coversDefaultClass \Drupal\address\Plugin\Validation\Constraint\CountryConstraintValidator
  * @group address
  */
-class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
+class CountryConstraintValidatorTest extends KernelTestBase {
 
   /**
    * The constraint.
@@ -23,6 +25,12 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
    * @var \Drupal\address\Plugin\Validation\Constraint\CountryConstraint
    */
   protected $constraint;
+
+  /**
+   * @var ConstraintValidatorInterface
+   */
+  protected $validator;
+
 
   /**
    * {@inheritdoc}
@@ -43,6 +51,27 @@ class CountryConstraintValidatorTest extends AbstractConstraintValidatorTest {
     $this->validator = $this->createValidator();
     $this->validator->initialize($this->context);
   }
+
+
+  protected function createContext()
+  {
+    $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+    $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+    $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+
+    $context = new ExecutionContext($validator, $this->root, $translator);
+    $context->setGroup($this->group);
+    $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
+    $context->setConstraint($this->constraint);
+
+    $validator->expects($this->any())
+      ->method('inContext')
+      ->with($context)
+      ->will($this->returnValue($contextualValidator));
+
+    return $context;
+  }
+
 
   protected function createValidator() {
     $country_repository = $this->getMock('CommerceGuys\Addressing\Repository\CountryRepositoryInterface');
